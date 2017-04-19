@@ -4,12 +4,14 @@ import {
   View,
   Text
 } from 'react-native'
+import { AnimatedCircularProgress } from 'react-native-circular-progress'
 
 import { actions }  from '../store.js'
-const { start } = actions
+const { start, edit_mode, apply_edit } = actions
 
 import Control from './Control'
-import Counter from './Counter'
+import EditTimer from './EditTimer'
+import CountdownTimer from './CountdownTimer'
 import timer from '../timer.js'
 
 
@@ -39,25 +41,43 @@ export default class TimerComponent extends PureComponent {
     }
   }
 
-  onComponentWillUnmount(){
+  componentWillUnmount(){
     this.pause()
   }
 
   render(){
-    const { duration, remaining, active } = this.props
+    const { duration, remaining, started, active, edit } = this.props
 
     return (
       <View style={styles.container}>
-        <Counter edit={false} duration={duration} remaining={remaining} />
-        <Control active={active}
-                 onStart={() => this.start(remaining) }
-                 onPause={this.pause.bind(this)}
-                 onReset={this.restart.bind(this)} />
-        <View>
+        <AnimatedCircularProgress size={200}
+                                  width={4}
+                                  fill={edit ? 100 : remaining/duration * 100}
+                                  tintColor="#8ddba6"
+                                  backgroundColor="#3d5875">
+          {
+            () =>
+              edit ?
+               (<EditTimer duration={duration}
+                           cancel={() => edit_mode(false)}
+                           apply={apply_edit} />)
+               :
+              (<CountdownTimer edit_mode={() => edit_mode(true)}
+                               duration={duration}
+                               remaining={remaining} />)
+          }
 
-        </View>
+        </AnimatedCircularProgress>
+
+        {
+          <Control active={active}
+                   started={started}
+                   onStart={() => !edit && this.start(remaining)}
+                   onPause={() => !edit && this.pause()}
+                   onReset={() => !edit && this.restart()} />
+        }
       </View>
-    );
+    )
   }
 }
 
@@ -71,4 +91,4 @@ const styles = StyleSheet.create({
     marginBottom: 150,
     height: 200,
   }
-});
+})

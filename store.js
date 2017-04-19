@@ -1,7 +1,12 @@
 import timer from './timer.js'
 import weedux, { middleware } from 'weedux'
 const { thunk } = middleware
+
+
 const initialState = {
+  time: {
+    edit: false,
+  },
   session: {
     // if a countdown was started
     started: false,
@@ -24,6 +29,7 @@ const initialState = {
   }
 }
 
+var handle = undefined
 const reducers = [
   // session
   (state, action) => {
@@ -42,13 +48,16 @@ const reducers = [
         break
       case 'SESSION_TICK':
         ns.session.remaining = action.remaining
-
         break
       case 'SESSION_PAUSE':
         ns.session.active = false
+        if (handle)
+          handle.stop()
+
 
         break
       case 'SESSION_RESET':
+        ns.time.edit = false
         ns.session = {
           ...session,
           started: false,
@@ -58,11 +67,15 @@ const reducers = [
           interruptions: 0,
         }
 
+        if (handle)
+          handle.stop()
+
         break
     }
 
     return ns
   },
+  // stats
   (state, action) => {
     const ns = { ...state }
     const session = state.session
@@ -85,13 +98,12 @@ const reducers = [
         }
 
         ns.stats.completed = state.stats.completed.concat([completedSession])
-          console.log(completedSession)
+        console.log(completedSession)
 
         break
       case 'SESSION_INTERRUPT':
         if (ns.session.active)
           ns.session.interruptions = session.interruptions + 1
-
         break
       case 'SESSION_QUIT':
         if (session.remaining < session.duration && session.started) {
@@ -105,20 +117,33 @@ const reducers = [
           ns.stats.quits = state.stats.quits.concat([prematureEndedSession])
           console.log(prematureEndedSession)
         }
-
         break
     }
 
     return ns
-
+  },
+  (state, action) => {
+    const ns = {...state}
+    const session = state.session
+    switch(action.type){
+      case 'SESSION_DURATION_EDIT_APPLY':
+        ns.session = {
+          ...session,
+          duration: action.duration,
+          remaining: action.duration,
+        }
+        break
+      case 'SESSION_DURATION_EDIT':
+        ns.time.edit = action.mode
+        break
+    }
+    return ns
   }
 
 ]
 
 const store = new weedux(initialState, reducers, [thunk])
 export default store
-
-
 export const onDispatchComplete = store.onDispatchComplete.bind(store)
 export const removeOnDispatchComplete = store.removeOnDispatchComplete.bind(store)
 export const dispatcher = store.dispatcher.bind(store)
@@ -126,7 +151,6 @@ export const state = store.getState.bind(store)
 
 
 const dispatch = store.dispatcher()
-var handle;
 export const actions = {
   start: (duration, cb) => {
     dispatch((d) => {
@@ -139,6 +163,7 @@ export const actions = {
       handle = timer(duration,
                     (remaining) => d({ type: 'SESSION_TICK', remaining }),
                     () => d({ type: 'SESSION_COMPLETE' }) )
+
 
       const reset = () => {
         handle.stop()
@@ -156,5 +181,14 @@ export const actions = {
     })
   },
   complete: () => dispatch({ type: 'SESSION_COMPLETE' }),
-  edit: (duration) => dispatch({ type: 'SESSION_DURATION_EDIT', duration })
+  edit_mode: (mode) => dispatch((d) => {
+    d({ type: 'SESSION_INTERRUPT' })
+    d({ type: 'SESSION_PAUSE' })
+    d({ type: 'SESSION_DURATION_EDIT', mode: !!mode })
+  }),
+  apply_edit: (duration) => dispatch((d) => {
+    d({ type: 'SESSION_DURATION_EDIT_APPLY', duration })
+    d({ type: 'SESSION_DURATION_EDIT', mode: false })
+    d({ type: 'SESSION_RESET' })
+  })
 }

@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
   AppRegistry,
   StyleSheet,
   Text,
   View,
   Button
-} from 'react-native';
+} from 'react-native'
 
 import AnimatedLinearGradient, {presetColors} from 'react-native-animated-linear-gradient'
 
@@ -26,13 +26,18 @@ export default class App extends Component {
     state: state
   }
 
-  onComponentWillUnmount(){
+  componentWillUnmount(){
     removeOnDispatchComplete(this.__handle__)
   }
 
+
   render() {
     const {
+      time: {
+        edit
+      },
       session: {
+        started,
         duration,
         remaining,
         active
@@ -40,15 +45,23 @@ export default class App extends Component {
     } = this.state
     return (
       <View style={styles.container}>
-        <AnimatedLinearGradient customColors={presetColors.instagram} speed={8000}/>
+        <AnimatedLinearGradient customColors={gradientColors} speed={10000}/>
         <Timer active={active}
+               started={started}
                duration={duration}
-               remaining={remaining} />
+               remaining={remaining}
+               edit={edit} />
       </View>
-    );
+    )
   }
 }
 
+const gradientColors = [
+  '#ca9ebc',
+  '#b992ad',
+  '#877481',
+  '#a57b53'
+]
 
 const styles = StyleSheet.create({
   container: {
@@ -57,4 +70,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   }
-});
+})
