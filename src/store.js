@@ -6,6 +6,7 @@ const { thunk } = middleware
 const initialState = {
   time: {
     edit: false,
+    active: false,
   },
   session: {
     // if a countdown was started
@@ -21,11 +22,16 @@ const initialState = {
     // the # of interruptions (pauses) during the session
     interruptions: 0,
   },
+  audio: {
+    audioURI: '',
+    playing: false,
+    finalVolume: 0,
+  },
   stats: {
     // sessions that were quit before finishing
     quits: [],
     // sessions that were successfully completed
-    completed: []
+    completed: [],
   }
 }
 
@@ -122,20 +128,30 @@ const reducers = [
 
     return ns
   },
+  // timer edit
   (state, action) => {
     const ns = {...state}
     const session = state.session
     switch(action.type){
-      case 'SESSION_DURATION_EDIT_APPLY':
+      case 'TIMER_EDIT_APPLY':
         ns.session = {
           ...session,
           duration: action.duration,
           remaining: action.duration,
         }
         break
-      case 'SESSION_DURATION_EDIT':
+      case 'TIMER_EDIT':
         ns.time.edit = action.mode
         break
+    }
+    return ns
+  },
+  (state, action) => {
+    const ns = {...state}
+    switch(action.type){
+      case 'AUDIO_PLAY':
+      case 'AUDIO_FILE_EDIT':
+      case 'AUDIO_VOLUME_EDIT':
     }
     return ns
   }
@@ -184,11 +200,11 @@ export const actions = {
   edit_mode: (mode) => dispatch((d) => {
     d({ type: 'SESSION_INTERRUPT' })
     d({ type: 'SESSION_PAUSE' })
-    d({ type: 'SESSION_DURATION_EDIT', mode: !!mode })
+    d({ type: 'TIMER_EDIT', mode: !!mode })
   }),
   apply_edit: (duration) => dispatch((d) => {
-    d({ type: 'SESSION_DURATION_EDIT_APPLY', duration })
-    d({ type: 'SESSION_DURATION_EDIT', mode: false })
+    d({ type: 'TIMER_EDIT_APPLY', duration })
+    d({ type: 'TIMER_EDIT', mode: false })
     d({ type: 'SESSION_RESET' })
   })
 }
