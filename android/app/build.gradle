@@ -58,7 +58,7 @@ import com.android.build.OutputFile
  *   inputExcludes: ["android/**", "ios/**"],
  *
  *   // override which node gets called and with what additional arguments
- *   nodeExecutableAndArgs: ["node"]
+ *   nodeExecutableAndArgs: ["node"],
  *
  *   // supply additional arguments to the packager
  *   extraPackagerArgs: []
@@ -87,7 +87,7 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "com.amituofo"
+        applicationId "com.test"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
@@ -126,10 +126,8 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-keep-awake')
-    compile project(':react-native-keep-screen-on')
-    compile project(':react-native-linear-gradient')
     compile project(':react-native-vector-icons')
+    compile project(':react-native-linear-gradient')
     compile fileTree(dir: "libs", include: ["*.jar"])
     compile "com.android.support:appcompat-v7:23.0.1"
     compile "com.facebook.react:react-native:+"  // From node_modules

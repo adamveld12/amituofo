@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { AnimatedCircularProgress } from 'react-native-circular-progress'
+//import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import FIcon from 'react-native-vector-icons/FontAwesome'
 import EIcon from 'react-native-vector-icons/EvilIcons'
 import MIcon from 'react-native-vector-icons/MaterialIcons'
@@ -17,7 +17,7 @@ export default class CountdownTImer extends PureComponent {
       <View style={styles.progress}>
         <View style={styles.timer}>
           <Text onLongPress={() => edit_mode()} style={styles.timerDisplay}>
-            { sprintf("%02d:%02d", minutes, seconds) }
+            { sprintf("%01d:%02d", minutes, seconds) }
           </Text>
         </View>
       </View>
@@ -25,26 +25,27 @@ export default class CountdownTImer extends PureComponent {
   }
 }
 
-const styles = StyleSheet.create({
+
+export const styles = StyleSheet.create({
   progress: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
   },
   timer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    width: 200,
+    width: 300,
   },
   timerDisplay: {
    backgroundColor: 'transparent',
    textAlign: 'center',
    color: 'white',
-   fontSize: 32,
+   fontSize: 40,
    fontWeight: "100"
  }
 })

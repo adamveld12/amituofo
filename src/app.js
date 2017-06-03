@@ -45,12 +45,14 @@ export default class App extends Component {
     } = this.state
     return (
       <View style={styles.container}>
+
         <AnimatedLinearGradient customColors={gradientColors} speed={10000}/>
+
         <Timer active={active}
-               started={started}
-               duration={duration}
-               remaining={remaining}
-               edit={edit} />
+           started={started}
+           duration={duration}
+           remaining={remaining}
+           edit={edit} />
       </View>
     )
   }

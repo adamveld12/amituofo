@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react'
 import {
+  AppState,
   StyleSheet,
   View,
   Text
 } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
-
 import { actions }  from '../store.js'
 const { start, edit_mode, apply_edit } = actions
 
@@ -17,32 +17,38 @@ import timer from '../timer.js'
 
 export default class TimerComponent extends PureComponent {
   constructor(){
-    super()
-    this.state = {}
+    super();
+    this.state = {};
   }
 
   start(duration){
-    start(duration, (timerHandle) => {
-      this.setState({ timerHandle })
-    })
+    start(duration, (timerHandle) => this.setState({ timerHandle }))
   }
 
   pause(){
     const th = this.state.timerHandle
-    if (th) {
+    if (th)
       th.pause()
-    }
   }
 
   restart(){
     const th = this.state.timerHandle
-    if (th) {
+    if (th)
       th.reset()
-    }
+  }
+
+  _handleStateChange = (nextState) => {
+    if (nextState.match(/inactive|background/))
+      this.pause();
+  }
+
+  componentDidMount(){
+    AppState.addEventListener('change', this._handleStateChange);
   }
 
   componentWillUnmount(){
     this.pause()
+    AppState.removeEventListener('change', this._handleStateChange);
   }
 
   render(){
@@ -50,8 +56,8 @@ export default class TimerComponent extends PureComponent {
 
     return (
       <View style={styles.container}>
-        <AnimatedCircularProgress size={200}
-                                  width={4}
+        <AnimatedCircularProgress size={300}
+                                  width={6}
                                   fill={edit ? 100 : remaining/duration * 100}
                                   tintColor="#8ddba6"
                                   backgroundColor="#3d5875">
@@ -66,6 +72,7 @@ export default class TimerComponent extends PureComponent {
                                duration={duration}
                                remaining={remaining} />)
           }
+
 
         </AnimatedCircularProgress>
 
@@ -89,6 +96,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     marginTop: 150,
     marginBottom: 150,
-    height: 200,
+    height: 300,
   }
 })
