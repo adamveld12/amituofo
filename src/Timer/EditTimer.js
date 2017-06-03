@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react'
-import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Platform, StyleSheet, TextInput, View } from 'react-native'
 import FIcon from 'react-native-vector-icons/FontAwesome'
 import EIcon from 'react-native-vector-icons/EvilIcons'
 import MIcon from 'react-native-vector-icons/MaterialIcons'
 
-import {sprintf} from 'sprintf'
+import { sprintf } from 'sprintf'
 
 export default class EditCounter extends PureComponent {
   constructor(){
@@ -46,8 +46,8 @@ export default class EditCounter extends PureComponent {
                        autoCorrect={false}
                        maxLength={4}
                        onChangeText={(v) => {
-                         let h = parseInt(v);
-                         if (h + "" !== "NaN") this.setState({ minutes:  h });
+                         let h = parseInt(v)
+                         if (h + "" !== "NaN") this.setState({ minutes:  h })
                        }}
                        onSubmitEditing={() => apply(minutes * 60)}
                        defaultValue={sprintf("%01d", minutes)} >
@@ -117,11 +117,11 @@ export const styles = StyleSheet.create({
    height: 40,
    fontSize: 45,
    fontWeight: "100",
+   minWidth: 70,
+   height: 60,
     ...Platform.select({
       android: {
-        minWidth: 70,
         fontSize: 35,
-        height: 60,
       }
     })
  }
