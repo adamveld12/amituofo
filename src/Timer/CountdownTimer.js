@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-//import { AnimatedCircularProgress } from 'react-native-circular-progress'
+import { StyleSheet, Platform, Text, View } from 'react-native'
 import FIcon from 'react-native-vector-icons/FontAwesome'
 import EIcon from 'react-native-vector-icons/EvilIcons'
 import MIcon from 'react-native-vector-icons/MaterialIcons'
@@ -48,4 +47,10 @@ export const styles = StyleSheet.create({
    fontSize: 40,
    fontWeight: "100"
  }
-})
+},
+Platform.select({
+  ios:{
+  },
+  android: {
+  }
+}))

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, Text, TextInput, View } from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import FIcon from 'react-native-vector-icons/FontAwesome'
 import EIcon from 'react-native-vector-icons/EvilIcons'
 import MIcon from 'react-native-vector-icons/MaterialIcons'
@@ -41,7 +41,10 @@ export default class EditCounter extends PureComponent {
             <TextInput style={styles.timerDisplay}
                        keyboardType="numeric"
                        returnKeyType="done"
+                       underlineColorAndroid={'rgba(0,0,0,0)'}
                        blurOnSubmit={false}
+                       autoCorrect={false}
+                       maxLength={4}
                        onChangeText={(v) => {
                          let h = parseInt(v);
                          if (h + "" !== "NaN") this.setState({ minutes:  h });
@@ -78,10 +81,10 @@ export default class EditCounter extends PureComponent {
 export const styles = StyleSheet.create({
   icon:{
     marginRight: 0,
-    marginTop: 10,
-    marginBottom: 10,
     justifyContent: 'center',
-    padding: 0
+    padding: 0,
+    fontWeight: "100",
+    fontSize: 32,
   },
   progress: {
     flex: 1,
@@ -102,16 +105,24 @@ export const styles = StyleSheet.create({
   editPanel: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    width: 300,
+    marginTop: 20,
+    width: 130,
   },
   timerDisplay: {
    backgroundColor: 'transparent',
    textAlign: 'center',
    color: 'white',
-   height: 45,
+   height: 40,
    fontSize: 45,
-   fontWeight: "100"
+   fontWeight: "100",
+    ...Platform.select({
+      android: {
+        minWidth: 70,
+        fontSize: 35,
+        height: 60,
+      }
+    })
  }
 })

@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import {
   AppState,
   StyleSheet,
+  Platform,
   View,
   Text
 } from 'react-native'
@@ -97,5 +98,12 @@ const styles = StyleSheet.create({
     marginTop: 150,
     marginBottom: 150,
     height: 300,
+    ...Platform.select({
+      android: {
+          marginTop: 50,
+          marginBottom: 50,
+      }
+    })
   }
+
 })
