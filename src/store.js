@@ -1,6 +1,7 @@
 import timer from './timer.js'
 import weedux, { middleware } from 'weedux'
-const { thunk } = middleware
+import { AsyncStorage } from 'react-native'
+const { thunk, logger } = middleware
 
 
 const initialState = {
@@ -59,8 +60,6 @@ const reducers = [
         ns.session.active = false
         if (handle)
           handle.stop()
-
-
         break
       case 'SESSION_RESET':
         ns.time.edit = false
@@ -146,6 +145,7 @@ const reducers = [
     }
     return ns
   },
+  // audio
   (state, action) => {
     const ns = {...state}
     switch(action.type){
@@ -154,11 +154,18 @@ const reducers = [
       case 'AUDIO_VOLUME_EDIT':
     }
     return ns
-  }
-
+  },
 ]
 
-const store = new weedux(initialState, reducers, [thunk])
+const persist = store => next => action => {
+  next(action);
+
+  AsyncStorage.setItem('@amituofo:state', JSON.stringify(store.getState()))
+              .then(() => console.log("saved state"))
+              .catch((e) => console.error(e));
+}
+
+const store = new weedux(initialState, reducers, [logger, thunk, persist])
 export default store
 export const onDispatchComplete = store.onDispatchComplete.bind(store)
 export const removeOnDispatchComplete = store.removeOnDispatchComplete.bind(store)
