@@ -17,9 +17,9 @@ const initialState = {
     // if the session is finished
     completed: false,
     // how long the session will last in seconds
-    duration: 60 * 60,
+    duration: 5 * 60,
     // how many seconds are left in the session
-    remaining: 60 * 60,
+    remaining: 5 * 60,
     // the # of interruptions (pauses) during the session
     interruptions: 0,
   },
@@ -51,7 +51,6 @@ const reducers = [
           completed: false,
           remaining: session.duration
         }
-
         break
       case 'SESSION_TICK':
         ns.session.remaining = action.remaining
@@ -155,15 +154,30 @@ const reducers = [
     }
     return ns
   },
+  // load from storage
+  (state, { type, state: loadedState }) => {
+    const ns = {...state}
+    switch(type){
+      case 'LOAD_STATE':
+      ns.stats = loadedState.stats
+      ns.audio = loadedState.audio
+      ns.session = loadedState.session
+      ns.session.active = false
+      break
+      // maybe add clear state
+    }
+
+    return ns
+  },
 ]
 
 const persist = store => next => action => {
-  next(action);
-
+  next(action)
   AsyncStorage.setItem('@amituofo:state', JSON.stringify(store.getState()))
               .then(() => console.log("saved state"))
-              .catch((e) => console.error(e));
+              .catch((e) => console.error(e))
 }
+
 
 const store = new weedux(initialState, reducers, [logger, thunk, persist])
 export default store
@@ -172,9 +186,18 @@ export const removeOnDispatchComplete = store.removeOnDispatchComplete.bind(stor
 export const dispatcher = store.dispatcher.bind(store)
 export const state = store.getState.bind(store)
 
-
 const dispatch = store.dispatcher()
+
+
 export const actions = {
+  load: () => {
+    dispatch((d) => {
+      AsyncStorage.getItem('@amituofo:state').then((state) => {
+        const newState = JSON.parse(state)
+        d({ type: 'LOAD_STATE', state: Object.assign(initialState, newState) })
+      }).catch((e) => console.error(e) )
+    })
+  },
   start: (duration, cb) => {
     dispatch((d) => {
       d({ type: 'SESSION_START', duration })
@@ -213,5 +236,5 @@ export const actions = {
     d({ type: 'TIMER_EDIT_APPLY', duration })
     d({ type: 'TIMER_EDIT', mode: false })
     d({ type: 'SESSION_RESET' })
-  })
+  }),
 }

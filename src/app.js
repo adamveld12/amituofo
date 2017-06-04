@@ -10,7 +10,11 @@ import {
 import AnimatedLinearGradient, {presetColors} from 'react-native-animated-linear-gradient'
 
 import Timer from './Timer'
-import { dispatcher, state, onDispatchComplete, removeOnDispatchComplete } from './store.js'
+import { dispatcher, state, onDispatchComplete, removeOnDispatchComplete, actions } from './store.js'
+const { load } = actions
+
+// loads previous store state from storage
+load();
 
 //import StatsPage from './statsPage.js'
 
