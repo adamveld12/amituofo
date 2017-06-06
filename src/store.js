@@ -1,8 +1,9 @@
-import timer from './timer.js'
+import timer from './timer'
+import player from './player'
 import weedux, { middleware } from 'weedux'
 import { AsyncStorage } from 'react-native'
-const { thunk, logger } = middleware
 
+const { thunk, logger } = middleware
 
 const initialState = {
   time: {
@@ -17,16 +18,16 @@ const initialState = {
     // if the session is finished
     completed: false,
     // how long the session will last in seconds
-    duration: 5 * 60,
+    duration: 10, //5 * 60,
     // how many seconds are left in the session
-    remaining: 5 * 60,
+    remaining: 10, //5 * 60,
     // the # of interruptions (pauses) during the session
     interruptions: 0,
   },
   audio: {
-    audioURI: '',
+    audioURI: 'singing_gong.mp3',
     playing: false,
-    finalVolume: 0,
+    finalVolume: 1,
   },
   stats: {
     // sessions that were quit before finishing
@@ -36,7 +37,6 @@ const initialState = {
   }
 }
 
-var handle = undefined
 const reducers = [
   // session
   (state, action) => {
@@ -57,8 +57,7 @@ const reducers = [
         break
       case 'SESSION_PAUSE':
         ns.session.active = false
-        if (handle)
-          handle.stop()
+        timerHandle && timerHandle.stop()
         break
       case 'SESSION_RESET':
         ns.time.edit = false
@@ -71,9 +70,7 @@ const reducers = [
           interruptions: 0,
         }
 
-        if (handle)
-          handle.stop()
-
+        timerHandle && timerHandle.stop()
         break
     }
 
@@ -102,8 +99,8 @@ const reducers = [
         }
 
         ns.stats.completed = state.stats.completed.concat([completedSession])
-        console.log(completedSession)
-
+        timerHandle && timerHandle.stop()
+        __DEV__ && console.log(completedSession)
         break
       case 'SESSION_INTERRUPT':
         if (ns.session.active)
@@ -119,7 +116,7 @@ const reducers = [
           }
 
           ns.stats.quits = state.stats.quits.concat([prematureEndedSession])
-          console.log(prematureEndedSession)
+          __DEV__ && console.log(prematureEndedSession)
         }
         break
     }
@@ -127,30 +124,38 @@ const reducers = [
     return ns
   },
   // timer edit
-  (state, action) => {
+  (state, { type, duration, mode }) => {
     const ns = {...state}
     const session = state.session
-    switch(action.type){
+    switch(type){
       case 'TIMER_EDIT_APPLY':
         ns.session = {
           ...session,
-          duration: action.duration,
-          remaining: action.duration,
+          duration,
+          remaining: duration,
         }
         break
       case 'TIMER_EDIT':
-        ns.time.edit = action.mode
+        ns.time.edit = mode
         break
     }
     return ns
   },
   // audio
-  (state, action) => {
+  (state, { type, volume, audioURI }) => {
     const ns = {...state}
-    switch(action.type){
+    switch(type){
+      case 'AUDIO_BEGIN_LOAD':
+      case 'AUDIO_LOADED':
       case 'AUDIO_PLAY':
+        ns.audio.active = true
+        break
       case 'AUDIO_FILE_EDIT':
+        ns.audio.audioURI = audioURI
+        break
       case 'AUDIO_VOLUME_EDIT':
+        ns.audio.finalVolume = volume
+        break
     }
     return ns
   },
@@ -160,7 +165,7 @@ const reducers = [
     switch(type){
       case 'LOAD_STATE':
       ns.stats = loadedState.stats
-      ns.audio = loadedState.audio
+      //ns.audio = loadedState.audio
       ns.session = loadedState.session
       ns.session.active = false
       break
@@ -174,8 +179,8 @@ const reducers = [
 const persist = store => next => action => {
   next(action)
   AsyncStorage.setItem('@amituofo:state', JSON.stringify(store.getState()))
-              .then(() => console.log("saved state"))
-              .catch((e) => console.error(e))
+              .then(() => __DEV__ && console.log("saved state"))
+              .catch((e) => __DEV__ && console.error(e))
 }
 
 
@@ -189,12 +194,15 @@ export const state = store.getState.bind(store)
 const dispatch = store.dispatcher()
 
 
+var timerHandle = undefined
+var playerHandle = undefined
 export const actions = {
   load: () => {
     dispatch((d) => {
       AsyncStorage.getItem('@amituofo:state').then((state) => {
         const newState = JSON.parse(state)
-        d({ type: 'LOAD_STATE', state: Object.assign(initialState, newState) })
+        console.log(newState)
+        //d({ type: 'LOAD_STATE', state: Object.assign(initialState, newState) })
       }).catch((e) => console.error(e) )
     })
   },
@@ -202,23 +210,19 @@ export const actions = {
     dispatch((d) => {
       d({ type: 'SESSION_START', duration })
 
-      if (handle) {
-        handle.stop()
-      }
+      timerHandle && timerHandle.stop()
 
-      handle = timer(duration,
+      timerHandle = timer(duration,
                     (remaining) => d({ type: 'SESSION_TICK', remaining }),
-                    () => d({ type: 'SESSION_COMPLETE' }) )
+                    () => actions.complete())
 
 
       const reset = () => {
-        handle.stop()
         d({ type: 'SESSION_QUIT' })
         d({ type: 'SESSION_RESET', duration })
       }
 
       const pause = () => {
-        handle.stop()
         d({ type: 'SESSION_INTERRUPT' })
         d({ type: 'SESSION_PAUSE' })
       }
@@ -226,13 +230,30 @@ export const actions = {
       cb({ reset, pause })
     })
   },
-  complete: () => dispatch({ type: 'SESSION_COMPLETE' }),
+  complete: () => {
+    playerHandle && playerHandle.stop()
+    console.log("firing complete")
+
+    const { audioURI, finalVolume } = store.getState().audio
+    playerHandle = player(audioURI, finalVolume, 12, (e) => {
+      if (e){
+        console.error(e)
+        return
+      }
+    })
+
+    dispatch({ type: 'SESSION_COMPLETE' })
+  },
   edit_mode: (mode) => dispatch((d) => {
+    playerHandle && playerHandle.stop()
+
     d({ type: 'SESSION_INTERRUPT' })
     d({ type: 'SESSION_PAUSE' })
     d({ type: 'TIMER_EDIT', mode: !!mode })
   }),
   apply_edit: (duration) => dispatch((d) => {
+    playerHandle && playerHandle.stop()
+
     d({ type: 'TIMER_EDIT_APPLY', duration })
     d({ type: 'TIMER_EDIT', mode: false })
     d({ type: 'SESSION_RESET' })

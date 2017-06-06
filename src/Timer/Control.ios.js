@@ -4,11 +4,10 @@ import { Button, StyleSheet, View } from 'react-native'
 export default class Control extends PureComponent {
   render(){
     const { active, onStart, onPause, onReset } = this.props
-    let color = '#F5FCFF'
+    const color = '#F5FCFF'
     return (
       <View style={styles.container}>
         <Button onPress={() => (active ? onPause : onStart)()} title={active ? "Pause" : "Start"} color={color} />
-
         <Button onPress={() => onReset()} title="Reset" color={color} />
       </View>
     )

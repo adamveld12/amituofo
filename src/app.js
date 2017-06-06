@@ -14,7 +14,7 @@ import { dispatcher, state, onDispatchComplete, removeOnDispatchComplete, action
 const { load } = actions
 
 // loads previous store state from storage
-load();
+load()
 
 //import StatsPage from './statsPage.js'
 
@@ -22,6 +22,7 @@ export default class App extends Component {
   constructor(){
     super()
     this.state = state()
+    __DEV__ && console.log("connecting to store")
     this.__handle__ = onDispatchComplete((s, a) => this.setState(s))
   }
 
@@ -31,9 +32,9 @@ export default class App extends Component {
   }
 
   componentWillUnmount(){
+    __DEV__ && console.log("unmounting app")
     removeOnDispatchComplete(this.__handle__)
   }
-
 
   render() {
     const {
@@ -45,7 +46,8 @@ export default class App extends Component {
         duration,
         remaining,
         active
-      }
+      },
+      audio
     } = this.state
     return (
       <View style={styles.container}>
@@ -56,7 +58,8 @@ export default class App extends Component {
            started={started}
            duration={duration}
            remaining={remaining}
-           edit={edit} />
+           edit={edit}
+           audio={audio} />
       </View>
     )
   }

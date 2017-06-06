@@ -11,15 +11,14 @@ import { actions }  from '../store.js'
 const { start, edit_mode, apply_edit } = actions
 
 import Control from './Control'
+import AudioControl from './AudioControl'
 import EditTimer from './EditTimer'
 import CountdownTimer from './CountdownTimer'
-import timer from '../timer.js'
-
 
 export default class TimerComponent extends PureComponent {
   constructor(){
-    super();
-    this.state = {};
+    super()
+    this.state = {}
   }
 
   start(duration){
@@ -40,20 +39,20 @@ export default class TimerComponent extends PureComponent {
 
   _handleStateChange = (nextState) => {
     if (nextState.match(/inactive|background/))
-      this.pause();
+      this.pause()
   }
 
   componentDidMount(){
-    AppState.addEventListener('change', this._handleStateChange);
+    AppState.addEventListener('change', this._handleStateChange)
   }
 
   componentWillUnmount(){
     this.pause()
-    AppState.removeEventListener('change', this._handleStateChange);
+    AppState.removeEventListener('change', this._handleStateChange)
   }
 
   render(){
-    const { duration, remaining, started, active, edit } = this.props
+    const { duration, remaining, started, active, edit, audio } = this.props
 
     return (
       <View style={styles.container}>
@@ -73,17 +72,15 @@ export default class TimerComponent extends PureComponent {
                                duration={duration}
                                remaining={remaining} />)
           }
-
-
         </AnimatedCircularProgress>
 
-        {
-          <Control active={active}
-                   started={started}
-                   onStart={() => !edit && this.start(remaining)}
-                   onPause={() => !edit && this.pause()}
-                   onReset={() => !edit && this.restart()} />
-        }
+        <Control active={active}
+                 started={started}
+                 onStart={() => !edit && this.start(remaining)}
+                 onPause={() => !edit && this.pause()}
+                 onReset={() => !edit && this.restart()} />
+
+        <AudioControl {...audio} />
       </View>
     )
   }
@@ -95,9 +92,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    marginTop: 150,
-    marginBottom: 150,
-    height: 300,
+    marginTop: 100,
     ...Platform.select({
       android: {
           marginTop: 50,
@@ -105,5 +100,4 @@ const styles = StyleSheet.create({
       }
     })
   }
-
 })
