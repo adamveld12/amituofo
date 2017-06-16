@@ -6,8 +6,6 @@ import {
   View
 } from 'react-native'
 
-import player from '../player'
-
 export default class AudioControl extends PureComponent {
   constructor(){
     super()

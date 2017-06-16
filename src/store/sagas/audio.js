@@ -100,10 +100,16 @@ export default function* startAudio(){
       const action = yield take(SESSION_COMPLETE)
       const { audioURI, finalVolume, playing } = yield select((state) => state.audio)
       console.log("starting audio")
-      const {} = yield race({
+      const { rampUpVolume } = yield race({
         rampUpVolume: call(play, audioURI, finalVolume, 7),
-        stop: take(AUDIO_STOP)
+        edit: take(TIMER_EDIT),
+        reset: take(SESSION_RESET),
+        pause: take(SESSION_PAUSE),
       })
+
+      if  (!rampUpVolume){
+        yield put({ type: AUDIO_STOP })
+      }
     }
   } finally {
     console.log("audio stopped")

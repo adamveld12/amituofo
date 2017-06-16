@@ -55,8 +55,5 @@ export const subscribe = store.subscribe
 export const dispatch = store.dispatch
 export const getState = store.getState
 
-import actionContext from './actions.js'
-export const actions = actionContext(store.dispatch)
-
 import actionCreators from './actions/index.js'
-export const actions2 = actionCreators(store.dispatch)
+export const actions = actionCreators(store.dispatch)

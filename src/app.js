@@ -10,7 +10,7 @@ import {
 import AnimatedLinearGradient, {presetColors} from 'react-native-animated-linear-gradient'
 
 import Timer from './Timer'
-import { dispatch, getState, subscribe, actions, actions2 } from './store'
+import { dispatch, getState, subscribe, actions } from './store'
 //import StatsPage from './statsPage.js'
 
 export default class App extends Component {
@@ -48,12 +48,12 @@ export default class App extends Component {
         <AnimatedLinearGradient customColors={gradientColors} speed={10000}/>
         <Timer
            actions={{
-             edit_mode: actions2.edit_mode,
-             apply_edit: actions2.apply_edit,
-             start: actions2.start,
-             pause: actions2.pause,
-             reset: actions2.reset,
-             complete: actions2.complete,
+             edit_mode: actions.edit_mode,
+             apply_edit: actions.apply_edit,
+             start: actions.start,
+             pause: actions.pause,
+             reset: actions.reset,
+             complete: actions.complete,
            }}
            active={active}
            started={started}
