@@ -7,8 +7,7 @@ import {
   Text
 } from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
-import { actions }  from '../store.js'
-const { start, edit_mode, apply_edit } = actions
+import { actions }  from '../store'
 
 import Control from './Control'
 import AudioControl from './AudioControl'
@@ -22,19 +21,18 @@ export default class TimerComponent extends PureComponent {
   }
 
   start(duration){
-    start(duration, (timerHandle) => this.setState({ timerHandle }))
+    const { actions : { start } } = this.props
+    start(duration)
   }
 
   pause(){
-    const th = this.state.timerHandle
-    if (th)
-      th.pause()
+    const { actions : { pause } } = this.props
+    pause()
   }
 
   restart(){
-    const th = this.state.timerHandle
-    if (th)
-      th.reset()
+    const { actions : { reset } } = this.props
+    reset()
   }
 
   _handleStateChange = (nextState) => {
@@ -52,7 +50,17 @@ export default class TimerComponent extends PureComponent {
   }
 
   render(){
-    const { duration, remaining, started, active, edit, audio } = this.props
+    const {
+      actions: {
+        apply_edit,
+        edit_mode,
+      },
+      duration,
+      remaining,
+      started,
+      active,
+      edit,
+      audio } = this.props
 
     return (
       <View style={styles.container}>

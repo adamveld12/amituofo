@@ -16,9 +16,10 @@
 		"react-native-linear-gradient": "^2.0.0",
 		"react-native-sound": "^0.10.1",
 		"react-native-vector-icons": "^4.0.1",
+		"redux-saga": "^0.15.3",
 		"sprintf": "^0.1.5",
 		"uuid": "^3.0.1",
-		"weedux": "^1.1.2"
+		"weedux": "^3.0.1"
 	},
 	"devDependencies": {
 		"babel-jest": "19.0.0",

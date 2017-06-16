@@ -10,30 +10,24 @@ import {
 import AnimatedLinearGradient, {presetColors} from 'react-native-animated-linear-gradient'
 
 import Timer from './Timer'
-import { dispatcher, state, onDispatchComplete, removeOnDispatchComplete, actions } from './store.js'
-const { load } = actions
-
-// loads previous store state from storage
-load()
-
+import { dispatch, getState, subscribe, actions, actions2 } from './store'
 //import StatsPage from './statsPage.js'
 
 export default class App extends Component {
   constructor(){
     super()
-    this.state = state()
+    this.state = getState()
     __DEV__ && console.log("connecting to store")
-    this.__handle__ = onDispatchComplete((s, a) => this.setState(s))
+    this.__handle__ = subscribe((s, a) => this.setState(s))
   }
 
   static defaultProps = {
-    dispatch: dispatcher,
-    state: state
+    dispatch: dispatch
   }
 
   componentWillUnmount(){
     __DEV__ && console.log("unmounting app")
-    removeOnDispatchComplete(this.__handle__)
+    this.__handle__()
   }
 
   render() {
@@ -51,10 +45,17 @@ export default class App extends Component {
     } = this.state
     return (
       <View style={styles.container}>
-
         <AnimatedLinearGradient customColors={gradientColors} speed={10000}/>
-
-        <Timer active={active}
+        <Timer
+           actions={{
+             edit_mode: actions2.edit_mode,
+             apply_edit: actions2.apply_edit,
+             start: actions2.start,
+             pause: actions2.pause,
+             reset: actions2.reset,
+             complete: actions2.complete,
+           }}
+           active={active}
            started={started}
            duration={duration}
            remaining={remaining}
