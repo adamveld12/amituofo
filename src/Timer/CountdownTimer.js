@@ -1,14 +1,17 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, Platform, Text, View } from 'react-native'
+
 import FIcon from 'react-native-vector-icons/FontAwesome'
 import EIcon from 'react-native-vector-icons/EvilIcons'
 import MIcon from 'react-native-vector-icons/MaterialIcons'
+
+import Control from './Control'
 
 import {sprintf} from 'sprintf'
 
 export default class CountdownTImer extends PureComponent {
   render(){
-    const { remaining, duration, edit_mode } = this.props
+    const { remaining, duration, edit_mode, onStart, onPause, onReset, active } = this.props
     const minutes = Math.floor(remaining / 60)
     const seconds = remaining - (minutes * 60)
 
@@ -19,6 +22,11 @@ export default class CountdownTImer extends PureComponent {
             { sprintf("%01d:%02d", minutes, seconds) }
           </Text>
         </View>
+
+        <Control active={active}
+                 onStart={onStart}
+                 onPause={onPause}
+                 onReset={onReset} />
       </View>
     )
   }

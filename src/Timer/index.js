@@ -77,16 +77,14 @@ export default class TimerComponent extends PureComponent {
                            apply={apply_edit} />)
                :
               (<CountdownTimer edit_mode={() => edit_mode(true)}
+                               onStart={() => !edit && this.start(remaining)}
+                               onPause={() => !edit && this.pause()}
+                               onReset={() => !edit && this.restart()}
+                               active={active}
                                duration={duration}
                                remaining={remaining} />)
           }
         </AnimatedCircularProgress>
-
-        <Control active={active}
-                 started={started}
-                 onStart={() => !edit && this.start(remaining)}
-                 onPause={() => !edit && this.pause()}
-                 onReset={() => !edit && this.restart()} />
 
         <AudioControl {...audio} />
       </View>
