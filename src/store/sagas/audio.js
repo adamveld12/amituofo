@@ -71,7 +71,6 @@ function volumeRamp(rampTime, finalVolume, audio){
 
 function* play(audioURI, finalVolume, rampTime){
   const audio = yield call(loadSound, audioURI)
-  console.log(audio)
 
   try {
     audio.setVolume(0).setNumberOfLoops(-1)
@@ -88,7 +87,7 @@ function* play(audioURI, finalVolume, rampTime){
 
   } finally {
     if(!(yield cancelled()))
-      console.log("audio completed successfully")
+      __DEV__ && console.log("audio completed successfully")
 
     audio.stop(() => audio.release())
   }
@@ -112,6 +111,6 @@ export default function* startAudio(){
       }
     }
   } finally {
-    console.log("audio stopped")
+    __DEV__ && console.log("audio stopped")
   }
 }
