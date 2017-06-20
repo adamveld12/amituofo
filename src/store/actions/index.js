@@ -4,7 +4,8 @@ import {
   SESSION_PAUSE,
   SESSION_RESET,
   TIMER_EDIT,
-  TIMER_EDIT_APPLY
+  TIMER_EDIT_APPLY,
+  AUDIO_STOP,
 } from './types.js'
 
 function wrapDispatch(actionCreator, dispatch) {
@@ -28,7 +29,7 @@ const timerActions = {
 export default function actionCreator(dispatch){
   const actions = {
     ...sessionActions,
-    ...timerActions
+    ...timerActions,
   }
 
   for (var k in actions){

@@ -63,6 +63,6 @@ export default function* startTimerSaga(seconds){
         yield put({ type: SESSION_INTERRUPT })
     }
   } finally {
-    console.log("timer terminated")
+    __DEV__ && console.log("timer terminated")
   }
 }

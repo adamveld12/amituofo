@@ -18,9 +18,9 @@ const initialState = {
     // if the session is finished
     completed: false,
     // how long the session will last in seconds
-    duration: 10, //5 * 60,
+    duration: 1, //5 * 60,
     // how many seconds are left in the session
-    remaining: 10, //5 * 60,
+    remaining: 1, //5 * 60,
     // the # of interruptions (pauses) during the session
     interruptions: 0,
   },
@@ -28,6 +28,7 @@ const initialState = {
     audioURI: 'singing_gong.mp3',
     playing: false,
     finalVolume: 1,
+    rampTime: 4
   },
   stats: {
     // sessions that were quit before finishing
