@@ -14,7 +14,7 @@ import {
 const countdown = (seconds) => {
   __DEV__ && console.log("creating a countdown for", seconds)
   return eventChannel(listener => {
-    const increment = 100
+    const increment = 500
     let timeRemaining = seconds * 1000
 
     setImmediate(() => listener(timeRemaining/1000))

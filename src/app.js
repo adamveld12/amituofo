@@ -22,10 +22,10 @@ export default class App extends Component {
   static defaultProps = {
     dispatch: dispatch
   }
-  
+
   componentWillMount(){
     __DEV__ && console.log("connecting to store")
-    this.__handle__ = subscribe((s, a) => console.log("updating state") || this.setState(s))
+    this.__handle__ = subscribe((s, a) =>  this.setState(s))
   }
 
   componentWillUnmount(){
