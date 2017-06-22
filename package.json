@@ -5,7 +5,8 @@
 	"scripts": {
 		"start": "node node_modules/react-native/local-cli/cli.js start",
 		"prod": "node node_modules/react-native/bin/react-native bundle --platform android --dev false --entry-file index.android.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/",
-		"buildApk": "cd android && ./gradlew assembleRelease",
+		"android-build": "rm -rf ./node_modules/react-native/third-party && cd android && ./gradlew assembleRelease",
+		"android-install": "cd android && ./gradlew installRelease",
 		"test": "jest"
 	},
 	"dependencies": {
