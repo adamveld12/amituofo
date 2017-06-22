@@ -18,7 +18,7 @@ export default class Progress extends PureComponent {
 
     return (
       <AnimatedCircularProgress size={300}
-                                width={6}
+                                width={15}
                                 fill={edit ? 100 : remaining/duration * 100}
                                 tintColor="#8ddba6"
                                 backgroundColor="#3d5875">
