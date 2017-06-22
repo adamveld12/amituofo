@@ -20,6 +20,7 @@ function loadSound(audioURI){
   return new Promise((resolve, reject) => {
     const alertSound = new Sound(audioURI, Sound.MAIN_BUNDLE, (error) => {
       if (error){
+        console.log("could not load sound:", error)
         reject(error)
         return
       }
@@ -48,7 +49,7 @@ function volumeRamp(rampTime, finalVolume, audio){
       currentRamp -= interval
 
       const normalizedVol = currentRamp / maxRamp
-      console.log(`${currentRamp}/${maxRamp} - ${1 - normalizedVol}`)
+      __DEV__ && console.log(`${currentRamp}/${maxRamp} - ${1 - normalizedVol}`)
 
       listener(finalVolume * (1 - normalizedVol))
 
@@ -58,9 +59,7 @@ function volumeRamp(rampTime, finalVolume, audio){
       }
     }, interval)
 
-    return () => {
-      intervalHandle && clearInterval(intervalHandle)
-    }
+    return () => intervalHandle && clearInterval(intervalHandle)
   });
 }
 
@@ -78,6 +77,7 @@ function* ramp(audio, rampTime, finalVolume){
       let volume = yield take(chan)
       audio.setVolume(volume)
     }
+
   } finally {
     if(!(yield cancelled())) {
       __DEV__ && console.log("audio ramped to", finalVolume)
@@ -90,13 +90,14 @@ function* play(audioURI, finalVolume, rampTime){
 }
 
 export default function* startAudio(){
+  var audioFile = undefined
   try {
     while(true){
       const action = yield take(SESSION_COMPLETE)
 
       const { audioURI, finalVolume, rampTime } = yield select((state) => state.audio)
 
-      const audio = yield call(loadSound, audioURI)
+      const audio = audioFile = yield call(loadSound, audioURI)
       audio.setVolume(0).setNumberOfLoops(-1)
 
       yield put({ type: AUDIO_PLAY })
@@ -111,9 +112,15 @@ export default function* startAudio(){
         yield put({ type: AUDIO_STOP })
         rampTask.cancel()
         audio.stop(() => audio.release())
+        audioFile = undefined
       }
     }
   } finally {
-    __DEV__ && console.log("audio stopped")
+
+    if (audioFile) {
+      audioFile.stop(() => audioFile.release())
+      rampTask.cancel()
+    }
+    __DEV__ && console.log("audio stopped unexpectedly")
   }
 }

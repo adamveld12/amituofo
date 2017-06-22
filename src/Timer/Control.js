@@ -26,6 +26,7 @@ export default class Control extends PureComponent {
   }
 
   renderAudioControl({ onReset }){
+    const color = '#F5FCFF'
     return (
       <View style={styles.container}>
           <MIcon.Button onPress={onReset}
@@ -33,6 +34,12 @@ export default class Control extends PureComponent {
                         name="check"
                         color="#7FFF00"
                         backgroundColor="transparent" />
+
+          <MIcon.Button onPress={onReset}
+                        name="autorenew"
+                        backgroundColor="transparent"
+                        iconStyle={styles.icon}
+                        color={color} />
       </View>
     )
   }
