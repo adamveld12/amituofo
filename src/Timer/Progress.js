@@ -15,7 +15,6 @@ export default class Progress extends PureComponent {
       duration,
       remaining,
       edit } = this.props
-      console.log(remaining/duration  * 100)
 
     return (
       <AnimatedCircularProgress size={300}

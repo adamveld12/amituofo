@@ -42,12 +42,10 @@ const initialState = {
 const persist = store => next => action => {
   next(action)
   AsyncStorage.setItem('@amituofo:state', JSON.stringify(store.getState()))
-              .then(() => __DEV__ && console.log("saved state"))
-              .catch((e) => __DEV__ && console.error(e))
 }
 
 const sagaMiddleware = createSagaMiddleware()
-export const store = new weedux(initialState, reducers, [logger, thunk, persist, sagaMiddleware])
+export const store = new weedux(initialState, reducers, [thunk, persist, sagaMiddleware])
 
 import sagas from './sagas'
 sagaMiddleware.run(sagas)

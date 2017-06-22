@@ -13,6 +13,7 @@ import Timer from './Timer'
 import { dispatch, getState, subscribe, actions } from './store'
 //import StatsPage from './statsPage.js'
 
+
 export default class App extends Component {
   constructor(){
     super()
@@ -24,12 +25,10 @@ export default class App extends Component {
   }
 
   componentWillMount(){
-    __DEV__ && console.log("connecting to store")
     this.__handle__ = subscribe((s, a) =>  this.setState(s))
   }
 
   componentWillUnmount(){
-    __DEV__ && console.log("unmounting app")
     this.__handle__()
   }
 

@@ -73,7 +73,6 @@ const stats = (state, action) => {
       }
 
       ns.stats.completed = state.stats.completed.concat([completedSession])
-      __DEV__ && console.log(completedSession)
       break
     case SESSION_INTERRUPT:
       if (ns.session.active)
@@ -89,7 +88,6 @@ const stats = (state, action) => {
         }
 
         ns.stats.quits = state.stats.quits.concat([prematureEndedSession])
-        __DEV__ && console.log(prematureEndedSession)
       }
       break
   }
