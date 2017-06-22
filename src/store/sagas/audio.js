@@ -9,7 +9,8 @@ import {
   SESSION_QUIT,
   SESSION_RESET,
   TIMER_EDIT,
-  AUDIO_STOP
+  AUDIO_PLAY,
+  AUDIO_STOP,
 } from '../actions/types.js'
 import Sound from 'react-native-sound'
 
@@ -19,6 +20,7 @@ function loadSound(audioURI){
   return new Promise((resolve, reject) => {
     const alertSound = new Sound(audioURI, Sound.MAIN_BUNDLE, (error) => {
       if (error){
+        console.log("could not load sound:", error)
         reject(error)
         return
       }
@@ -42,75 +44,83 @@ function volumeRamp(rampTime, finalVolume, audio){
     const interval = 100
     let currentRamp = rampTime * 1000
     const maxRamp = currentRamp
-    var thandle
 
     const intervalHandle = setInterval(() => {
       currentRamp -= interval
 
       const normalizedVol = currentRamp / maxRamp
-      console.log(`${currentRamp}/${maxRamp} - ${1 - normalizedVol}`)
+      __DEV__ && console.log(`${currentRamp}/${maxRamp} - ${1 - normalizedVol}`)
 
       listener(finalVolume * (1 - normalizedVol))
 
       if (currentRamp <= 0){
         clearInterval(intervalHandle)
-        audio.setNumberOfLoops(0)
-
-         thandle = setTimeout(() => {
-            listener(END)
-         }, interval * 100)
+        listener(END)
       }
     }, interval)
 
-    return () => {
-      intervalHandle && clearInterval(intervalHandle)
-      thandle && clearTimeout(thandle)
-    }
+    return () => intervalHandle && clearInterval(intervalHandle)
   });
 }
 
-function* play(audioURI, finalVolume, rampTime){
-  const audio = yield call(loadSound, audioURI)
+function* stop(audio){
+  yield take(AUDIO_STOP)
+  audio.stop(() => audio.release())
+}
 
+function* ramp(audio, rampTime, finalVolume){
   try {
-    audio.setVolume(0).setNumberOfLoops(-1)
-
-    console.log("playing audio")
-    const handle = yield fork(playSound, audio)
-
-
+    __DEV__ && console.log("playing audio")
     const chan = yield call(volumeRamp, rampTime, finalVolume, audio)
+
     while(true){
       let volume = yield take(chan)
       audio.setVolume(volume)
     }
 
   } finally {
-    if(!(yield cancelled()))
-      __DEV__ && console.log("audio completed successfully")
-
-    audio.stop(() => audio.release())
+    if(!(yield cancelled())) {
+      __DEV__ && console.log("audio ramped to", finalVolume)
+    }
   }
 }
 
+function* play(audioURI, finalVolume, rampTime){
+  yield fork(ramp, audio, rampTime, finalVolume)
+}
+
 export default function* startAudio(){
+  var audioFile = undefined
   try {
     while(true){
       const action = yield take(SESSION_COMPLETE)
-      const { audioURI, finalVolume, playing } = yield select((state) => state.audio)
-      console.log("starting audio")
-      const { rampUpVolume } = yield race({
-        rampUpVolume: call(play, audioURI, finalVolume, 7),
-        edit: take(TIMER_EDIT),
-        reset: take(SESSION_RESET),
-        pause: take(SESSION_PAUSE),
+
+      const { audioURI, finalVolume, rampTime } = yield select((state) => state.audio)
+
+      const audio = audioFile = yield call(loadSound, audioURI)
+      audio.setVolume(0).setNumberOfLoops(-1)
+
+      yield put({ type: AUDIO_PLAY })
+      let rampTask = yield fork(ramp, audio, rampTime, finalVolume)
+
+      const { audioPlayback } = yield race({
+        audioPlayback: call(playSound, audio),
+        cancel: take([TIMER_EDIT, SESSION_RESET, SESSION_PAUSE]),
       })
 
-      if  (!rampUpVolume){
+      if  (!audioPlayback){
         yield put({ type: AUDIO_STOP })
+        rampTask.cancel()
+        audio.stop(() => audio.release())
+        audioFile = undefined
       }
     }
   } finally {
-    __DEV__ && console.log("audio stopped")
+
+    if (audioFile) {
+      audioFile.stop(() => audioFile.release())
+      rampTask.cancel()
+    }
+    __DEV__ && console.log("audio stopped unexpectedly")
   }
 }

@@ -14,7 +14,7 @@ import {
 const countdown = (seconds) => {
   __DEV__ && console.log("creating a countdown for", seconds)
   return eventChannel(listener => {
-    const increment = 100
+    const increment = 500
     let timeRemaining = seconds * 1000
 
     setImmediate(() => listener(timeRemaining/1000))
@@ -63,6 +63,6 @@ export default function* startTimerSaga(seconds){
         yield put({ type: SESSION_INTERRUPT })
     }
   } finally {
-    console.log("timer terminated")
+    __DEV__ && console.log("timer terminated")
   }
 }

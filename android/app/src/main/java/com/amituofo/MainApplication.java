@@ -1,4 +1,4 @@
-package com.test;
+package com.amituofo;
 
 import android.app.Application;
 

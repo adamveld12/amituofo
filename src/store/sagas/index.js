@@ -4,6 +4,6 @@ import startTimer from './timer'
 import startAudio from './audio'
 
 export default function* rootSaga(){
-  yield fork(startTimer)
   yield fork(startAudio)
+  yield fork(startTimer)
 }

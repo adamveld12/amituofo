@@ -6,54 +6,33 @@ import {
   View,
   Text
 } from 'react-native'
-import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import { actions }  from '../store'
 
 import Control from './Control'
 import AudioControl from './AudioControl'
 import EditTimer from './EditTimer'
 import CountdownTimer from './CountdownTimer'
+import Progress from './Progress'
 
 export default class TimerComponent extends PureComponent {
-  constructor(){
-    super()
-    this.state = {}
-  }
-
-  start(duration){
-    const { actions : { start } } = this.props
-    start(duration)
-  }
-
-  pause(){
-    const { actions : { pause } } = this.props
-    pause()
-  }
-
-  restart(){
-    const { actions : { reset } } = this.props
-    reset()
-  }
-
   _handleStateChange = (nextState) => {
-    if (nextState.match(/inactive|background/))
-      this.pause()
+    if (nextState.match(/inactive|background/)) {
+      const { actions : { pause } } = this.props
+      pause()
+    }
   }
 
-  componentDidMount(){
-    AppState.addEventListener('change', this._handleStateChange)
-  }
-
-  componentWillUnmount(){
-    this.pause()
-    AppState.removeEventListener('change', this._handleStateChange)
-  }
+  componentDidMount = () => AppState.addEventListener('change', this._handleStateChange)
+  componentWillUnmount = () => AppState.removeEventListener('change', this._handleStateChange)
 
   render(){
     const {
       actions: {
         apply_edit,
         edit_mode,
+        reset,
+        pause,
+        start,
       },
       duration,
       remaining,
@@ -64,29 +43,23 @@ export default class TimerComponent extends PureComponent {
 
     return (
       <View style={styles.container}>
-        <AnimatedCircularProgress size={300}
-                                  width={6}
-                                  fill={edit ? 100 : remaining/duration * 100}
-                                  tintColor="#8ddba6"
-                                  backgroundColor="#3d5875">
+        <Progress duration={duration} edit={edit} remaining={remaining} >
           {
-            () =>
               edit ?
                (<EditTimer duration={duration}
                            cancel={() => edit_mode(false)}
                            apply={apply_edit} />)
                :
-              (<CountdownTimer edit_mode={() => edit_mode(true)}
+              (<CountdownTimer onEditMode={() => edit_mode(true)}
+                               onStart={() => !edit && start(remaining)}
+                               onPause={() => !edit && pause()}
+                               onReset={() => !edit && reset()}
+                               audioPlaying={audio.playing}
+                               active={active}
                                duration={duration}
                                remaining={remaining} />)
           }
-        </AnimatedCircularProgress>
-
-        <Control active={active}
-                 started={started}
-                 onStart={() => !edit && this.start(remaining)}
-                 onPause={() => !edit && this.pause()}
-                 onReset={() => !edit && this.restart()} />
+        </Progress>
 
         <AudioControl {...audio} />
       </View>

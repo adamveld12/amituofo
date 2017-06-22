@@ -17,12 +17,15 @@ export default class App extends Component {
   constructor(){
     super()
     this.state = getState()
-    __DEV__ && console.log("connecting to store")
-    this.__handle__ = subscribe((s, a) => this.setState(s))
   }
 
   static defaultProps = {
     dispatch: dispatch
+  }
+
+  componentWillMount(){
+    __DEV__ && console.log("connecting to store")
+    this.__handle__ = subscribe((s, a) =>  this.setState(s))
   }
 
   componentWillUnmount(){
@@ -54,6 +57,7 @@ export default class App extends Component {
              pause: actions.pause,
              reset: actions.reset,
              complete: actions.complete,
+             stopAudio: actions.stop,
            }}
            active={active}
            started={started}
