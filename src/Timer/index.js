@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import {
   AppState,
   StyleSheet,
@@ -6,6 +6,8 @@ import {
   View,
   Text
 } from 'react-native'
+import PropTypes from 'prop-types'
+
 import { actions }  from '../store'
 
 import Control from './Control'
@@ -14,71 +16,71 @@ import EditTimer from './EditTimer'
 import CountdownTimer from './CountdownTimer'
 import Progress from './Progress'
 
-export default class TimerComponent extends PureComponent {
-  _handleStateChange = (nextState) => {
-    if (nextState.match(/inactive|background/)) {
-      const { actions : { pause } } = this.props
-      pause()
+import Timer from './Timer.js'
+
+export default class TimerContainerComponent extends Component {
+    static navigationOptions = {
+        title: "Timer"
     }
-  }
 
-  componentDidMount = () => AppState.addEventListener('change', this._handleStateChange)
-  componentWillUnmount = () => AppState.removeEventListener('change', this._handleStateChange)
+    _handleStateChange = (nextState) => {
+        if (nextState.match(/inactive|background/)) {
+              const { actions : { pause } } = this.props
+              pause()
+        }
+    }
 
-  render(){
-    const {
-      actions: {
-        apply_edit,
-        edit_mode,
-        reset,
-        pause,
-        start,
-      },
-      duration,
-      remaining,
-      started,
-      active,
-      edit,
-      audio } = this.props
+    componentDidMount = () => AppState.addEventListener('change', this._handleStateChange)
+    componentWillUnmount = () => AppState.removeEventListener('change', this._handleStateChange)
 
-    return (
-      <View style={styles.container}>
-        <Progress duration={duration} edit={edit} remaining={remaining} >
-          {
-              edit ?
-               (<EditTimer duration={duration}
-                           cancel={() => edit_mode(false)}
-                           apply={apply_edit} />)
-               :
-              (<CountdownTimer onEditMode={() => edit_mode(true)}
-                               onStart={() => !edit && start(remaining)}
-                               onPause={() => !edit && pause()}
-                               onReset={() => !edit && reset()}
-                               audioPlaying={audio.playing}
-                               active={active}
-                               duration={duration}
-                               remaining={remaining} />)
-          }
-        </Progress>
+    render(){
+        const actionProps = {
+             edit_mode: actions.edit_mode,
+             apply_edit: actions.apply_edit,
+             start: actions.start,
+             pause: actions.pause,
+             reset: actions.reset,
+             complete: actions.complete,
+             stopAudio: actions.stop,
+       }
 
-        <AudioControl {...audio} />
-      </View>
-    )
-  }
+        const {
+            time: {
+                edit
+            },
+            session: {
+                started,
+                duration,
+                remaining,
+                active
+            },
+            audio
+        } = this.props
+
+        return (<Timer actions={actionProps}
+                        edit={edit}
+                        duration={duration}
+                        started={started}
+                        remaining={remaining}
+                        active={active}
+                        audio={audio} />)
+    }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-    marginTop: 100,
-    ...Platform.select({
-      android: {
-          marginTop: 50,
-          marginBottom: 50,
-      }
-    })
-  }
-})
+TimerContainerComponent.propTypes = {
+    time: PropTypes.shape({
+        edit: PropTypes.bool.isRequired
+    }).isRequired,
+    session: PropTypes.shape({
+        started: PropTypes.bool.isRequired,
+        active: PropTypes.bool.isRequired,
+        duration: PropTypes.number.isRequired,
+        remaining: PropTypes.number.isRequired,
+    }),
+    audio: PropTypes.shape({
+        audioURI: PropTypes.string.isRequired,
+        playing: PropTypes.bool.isRequired,
+        finalVolume: PropTypes.number.isRequired,
+        rampTime: PropTypes.number.isRequired,
+    }).isRequired
+}

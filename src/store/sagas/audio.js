@@ -11,6 +11,7 @@ import {
   TIMER_EDIT,
   AUDIO_PLAY,
   AUDIO_STOP,
+  ANALYTICS_ERROR,
 } from '../actions/types.js'
 import Sound from 'react-native-sound'
 
@@ -20,7 +21,6 @@ function loadSound(audioURI){
   return new Promise((resolve, reject) => {
     const alertSound = new Sound(audioURI, Sound.MAIN_BUNDLE, (error) => {
       if (error){
-        console.log("could not load sound:", error)
         reject(error)
         return
       }
@@ -49,7 +49,6 @@ function volumeRamp(rampTime, finalVolume, audio){
       currentRamp -= interval
 
       const normalizedVol = currentRamp / maxRamp
-      __DEV__ && console.log(`${currentRamp}/${maxRamp} - ${1 - normalizedVol}`)
 
       listener(finalVolume * (1 - normalizedVol))
 
@@ -69,20 +68,12 @@ function* stop(audio){
 }
 
 function* ramp(audio, rampTime, finalVolume){
-  try {
-    __DEV__ && console.log("playing audio")
     const chan = yield call(volumeRamp, rampTime, finalVolume, audio)
 
     while(true){
       let volume = yield take(chan)
       audio.setVolume(volume)
     }
-
-  } finally {
-    if(!(yield cancelled())) {
-      __DEV__ && console.log("audio ramped to", finalVolume)
-    }
-  }
 }
 
 function* play(audioURI, finalVolume, rampTime){
@@ -101,7 +92,7 @@ export default function* startAudio(){
       audio.setVolume(0).setNumberOfLoops(-1)
 
       yield put({ type: AUDIO_PLAY })
-      let rampTask = yield fork(ramp, audio, rampTime, finalVolume)
+      const rampTask = yield fork(ramp, audio, rampTime, finalVolume)
 
       const { audioPlayback } = yield race({
         audioPlayback: call(playSound, audio),
@@ -115,12 +106,15 @@ export default function* startAudio(){
         audioFile = undefined
       }
     }
+  } catch(e) {
+    yield put({
+      type: ANALYTICS_ERROR,
+      message: "audio saga exited unexpectedly",
+      error: e
+     })
   } finally {
-
     if (audioFile) {
       audioFile.stop(() => audioFile.release())
-      rampTask.cancel()
     }
-    __DEV__ && console.log("audio stopped unexpectedly")
   }
 }

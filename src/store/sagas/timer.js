@@ -12,7 +12,6 @@ import {
 } from '../actions/types.js'
 
 const countdown = (seconds) => {
-  __DEV__ && console.log("creating a countdown for", seconds)
   return eventChannel(listener => {
     const increment = 500
     let timeRemaining = seconds * 1000
@@ -46,7 +45,7 @@ function* incrementTimer({ duration }){
   }
 }
 
-export default function* startTimerSaga(seconds){
+export default function* startTimerSaga(){
   try {
     while(true){
       const action = yield take(SESSION_START)
@@ -62,6 +61,12 @@ export default function* startTimerSaga(seconds){
       else if (paused)
         yield put({ type: SESSION_INTERRUPT })
     }
+  } catch(e){
+    yield put({
+      type: ANALYTICS_ERROR,
+      message: "some how the timer was terminated improperly",
+      error: e
+     })
   } finally {
     __DEV__ && console.log("timer terminated")
   }

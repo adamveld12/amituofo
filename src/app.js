@@ -6,6 +6,7 @@ import {
   View,
   Button
 } from 'react-native'
+import { StackNavigator } from 'react-navigation'
 
 import AnimatedLinearGradient, {presetColors} from 'react-native-animated-linear-gradient'
 
@@ -14,18 +15,24 @@ import { dispatch, getState, subscribe, actions } from './store'
 //import StatsPage from './statsPage.js'
 
 
+const screens = StackNavigator({
+    Timer: { screen: Timer, title: "Timer" },
+    //Stats: { screen: Stats, title: "Statistics" },
+    //Timer: { screen: Settings, title: "Settings" },
+})
+
 export default class App extends Component {
   constructor(){
     super()
     this.state = getState()
   }
 
-  static defaultProps = {
-    dispatch: dispatch
-  }
-
   componentWillMount(){
     this.__handle__ = subscribe((s, a) =>  this.setState(s))
+  }
+
+  componentDidMount(){
+      actions.load()
   }
 
   componentWillUnmount(){
@@ -33,37 +40,10 @@ export default class App extends Component {
   }
 
   render() {
-    const {
-      time: {
-        edit
-      },
-      session: {
-        started,
-        duration,
-        remaining,
-        active
-      },
-      audio
-    } = this.state
     return (
       <View style={styles.container}>
         <AnimatedLinearGradient customColors={gradientColors} speed={10000}/>
-        <Timer
-           actions={{
-             edit_mode: actions.edit_mode,
-             apply_edit: actions.apply_edit,
-             start: actions.start,
-             pause: actions.pause,
-             reset: actions.reset,
-             complete: actions.complete,
-             stopAudio: actions.stop,
-           }}
-           active={active}
-           started={started}
-           duration={duration}
-           remaining={remaining}
-           edit={edit}
-           audio={audio} />
+        <Timer {...this.state} />
       </View>
     )
   }
