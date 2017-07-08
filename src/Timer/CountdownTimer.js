@@ -1,36 +1,61 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, Platform, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import PropTypes from 'prop-types'
 
 import FIcon from 'react-native-vector-icons/FontAwesome'
 import EIcon from 'react-native-vector-icons/EvilIcons'
 import MIcon from 'react-native-vector-icons/MaterialIcons'
+import { sprintf } from 'sprintf'
+import isEqual from 'lodash.isequal'
 
 import Control from './Control'
 
-import {sprintf} from 'sprintf'
+export default class CountdownTimer extends PureComponent {
+    shouldComponentUpdate(nextProps, nextState){
+        return !isEqual(nextProps, this.props)
+    }
 
-export default class CountdownTImer extends PureComponent {
-  render(){
-    const { remaining, duration, onEditMode, onStart, onPause, onReset, active, audioPlaying } = this.props
-    const minutes = Math.floor(remaining / 60)
-    const seconds = remaining - (minutes * 60)
+    render(){
+        const {
+            remaining,
+            duration,
+            onEditMode,
+            onStart,
+            onPause,
+            onReset,
+            active,
+            audioPlaying
+        } = this.props
+        const minutes = Math.floor(remaining / 60)
+        const seconds = remaining - (minutes * 60)
 
-    return (
-      <View style={styles.progress}>
-        <View style={styles.timer}>
-          <Text onLongPress={() => onEditMode()} style={styles.timerDisplay}>
-            { sprintf("%01d:%02d", minutes, seconds) }
-          </Text>
-        </View>
+        return (
+          <View style={styles.progress}>
+            <View style={styles.timer}>
+              <Text onLongPress={() => onEditMode()} style={styles.timerDisplay}>
+                { sprintf("%01d:%02d", minutes, seconds) }
+              </Text>
+            </View>
 
-        <Control active={active}
-                 audioPlaying={audioPlaying}
-                 onStart={onStart}
-                 onPause={onPause}
-                 onReset={onReset} />
-      </View>
-    )
-  }
+            <Control active={active}
+                     audioPlaying={audioPlaying}
+                     onStart={onStart}
+                     onPause={onPause}
+                     onReset={onReset} />
+          </View>
+        )
+    }
+}
+
+CountdownTimer.propTypes = {
+    remaining: PropTypes.number.isRequired,
+    duration: PropTypes.number.isRequired,
+    onEditMode: PropTypes.func.isRequired,
+    onStart: PropTypes.func.isRequired,
+    onPause: PropTypes.func.isRequired,
+    onReset: PropTypes.func.isRequired,
+    active: PropTypes.bool.isRequired,
+    audioPlaying: PropTypes.bool.isRequired
 }
 
 
