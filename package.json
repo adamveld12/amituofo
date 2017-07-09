@@ -20,6 +20,7 @@
 		"react-native": "0.45.1",
 		"react-native-animated-linear-gradient": "^1.0.2",
 		"react-native-circular-progress": "git+https://git@github.com/insidelabs/react-native-circular-progress",
+		"react-native-keep-awake": "^2.0.4",
 		"react-native-linear-gradient": "^2.0.0",
 		"react-native-sentry": "^0.12.12",
 		"react-native-sound": "^0.10.1",

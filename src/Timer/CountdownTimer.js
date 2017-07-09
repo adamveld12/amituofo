@@ -39,7 +39,7 @@ export default class CountdownTimer extends PureComponent {
         return (
           <View style={styles.progress}>
             <View style={styles.timer}>
-              <Text onLongPress={() => onEditMode()} style={styles.timerDisplay}>
+              <Text onLongPress={onEditMode} style={styles.timerDisplay}>
                 { sprintf("%01d:%02d", minutes, seconds) }
               </Text>
             </View>

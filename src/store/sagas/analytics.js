@@ -7,9 +7,11 @@ import { v4 } from 'uuid'
 import config from '../../config'
 
 
-Sentry.config(config.SENTRY_URL, Object.assign(config.SENTRY_OPTS, {
-    deactivateStacktraceMerging: true
-})).install()
+if (!__DEV__){
+    Sentry.config(config.SENTRY_URL, Object.assign(config.SENTRY_OPTS, {
+        deactivateStacktraceMerging: true
+    })).install()
+}
 
 if (__DEV__){
     Sentry.setEventSentSuccessfully((event) => {
@@ -112,8 +114,11 @@ export default function* startAnalytics(){
         // wait until data has been loaded from storage
         yield take(LOAD_STATE_FINISHED)
         const identity = yield call(identify)
-        // next record any actions we're interested in
-        yield call(startSentry, identity)
+
+        if (!__DEV__){
+            // next record any actions we're interested in
+            yield call(startSentry, identity)
+        }
     }
   } finally {
     __DEV__ && console.log("sentry terminated")

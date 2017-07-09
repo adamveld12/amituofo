@@ -15,13 +15,7 @@ import Progress from './Progress'
 import { actions, store } from '../store'
 import { connect } from 'weedux'
 
-import AnimatedLinearGradient, {presetColors} from 'react-native-animated-linear-gradient'
-const gradientColors = [
-  '#ca9ebc',
-  '#b992ad',
-  '#877481',
-  '#a57b53'
-]
+import KeepAwake from 'react-native-keep-awake'
 
 class TimerContainerComponent extends Component {
     static navigationOptions = {
@@ -60,8 +54,14 @@ class TimerContainerComponent extends Component {
         }
     }
 
-    componentDidMount = () => AppState.addEventListener('change', this._handleStateChange)
-    componentWillUnmount = () => AppState.removeEventListener('change', this._handleStateChange)
+    componentDidMount() {
+        AppState.addEventListener('change', this._handleStateChange)
+    }
+
+    componentWillUnmount() {
+        AppState.removeEventListener('change', this._handleStateChange)
+        KeepAwake.deactivate()
+    }
 
     render(){
         const {
@@ -134,12 +134,30 @@ export default connect(
         } = actions
 
         return ({
-            onStart: (remaining, editMode) => (!editMode && dispatch(session.start(remaining))),
-            onPause: (editMode) => !editMode && dispatch(session.pause()),
-            onReset: (editMode) => !editMode && dispatch(session.reset()),
-            onEditMode: (editMode) => !editMode && dispatch(timer.edit(true)),
-            onCancelEdit: (editMode) => editMode && dispatch(timer.edit(false)),
-            onApplyEdit: (duration) => dispatch(timer.apply(duration))
+            onStart: (remaining, editMode) => {
+                !editMode && dispatch(session.start(remaining))
+                KeepAwake.activate()
+            },
+            onPause: (editMode) => {
+                !editMode && dispatch(session.pause())
+                KeepAwake.deactivate()
+            },
+            onReset: (editMode) => {
+                !editMode && dispatch(session.reset())
+                KeepAwake.deactivate()
+            },
+            onEditMode: (editMode) => {
+                !editMode && dispatch(timer.edit(true))
+                KeepAwake.deactivate()
+            },
+            onCancelEdit: (editMode) => {
+                editMode && dispatch(timer.edit(false))
+                KeepAwake.deactivate()
+            },
+            onApplyEdit: (duration) => {
+                dispatch(timer.apply(duration))
+                KeepAwake.deactivate()
+            }
         })
     },
     store
