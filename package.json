@@ -6,24 +6,30 @@
 		"start": "node node_modules/react-native/local-cli/cli.js start --resetCache",
 		"packager": "./node_modules/react-native/packager/packager.sh start --resetCache",
 		"android-bundle": "react-native bundle --platform android --dev false --entry-file index.android.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/",
-		"android-build": "rm -rf ./node_modules/react-native/third-party && cd android && ./gradlew assembleRelease",
+		"android-build": "cd android && ./gradlew assembleRelease",
 		"android-install": "cd android && ./gradlew installRelease",
+		"release": "yarn android-bundle && yarn android-build && yarn android-install",
 		"test": "jest"
 	},
 	"dependencies": {
 		"art": "^0.10.1",
 		"events": "^1.1.1",
+		"lodash.isequal": "^4.5.0",
+		"prop-types": "^15.5.10",
 		"react": "16.0.0-alpha.12",
 		"react-native": "0.45.1",
 		"react-native-animated-linear-gradient": "^1.0.2",
 		"react-native-circular-progress": "git+https://git@github.com/insidelabs/react-native-circular-progress",
+		"react-native-keep-awake": "^2.0.4",
 		"react-native-linear-gradient": "^2.0.0",
+		"react-native-sentry": "^0.12.12",
 		"react-native-sound": "^0.10.1",
 		"react-native-vector-icons": "^4.0.1",
+		"react-navigation": "^1.0.0-beta.11",
 		"redux-saga": "^0.15.3",
 		"sprintf": "^0.1.5",
 		"uuid": "^3.0.1",
-		"weedux": "^3.0.1"
+		"weedux": "3.1.2"
 	},
 	"devDependencies": {
 		"babel-jest": "20.0.3",

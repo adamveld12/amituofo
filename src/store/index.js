@@ -1,12 +1,16 @@
+import React from 'react'
 import weedux, { middleware } from 'weedux'
 import { AsyncStorage } from 'react-native'
 import reducers from './reducers'
 import createSagaMiddleware from 'redux-saga'
+import { v4 } from 'uuid'
 
 const { thunk, logger } = middleware
 
-const initialState = {
+export const initialState = {
+  user: {},
   time: {
+      // if timer is in edit mode
     edit: false,
     active: false,
   },
@@ -38,16 +42,25 @@ const initialState = {
   }
 }
 
+const sagaMiddleware = createSagaMiddleware()
 
-const persist = store => next => action => {
-  next(action)
-  AsyncStorage.setItem('@amituofo:state', JSON.stringify(store.getState()))
-              .then(() => __DEV__ && console.log("saved state"))
-              .catch((e) => __DEV__ && console.error(e))
+const persist = s => n => a => {
+    n(a)
+    n({ type: "SAVE_STATE" })
 }
 
-const sagaMiddleware = createSagaMiddleware()
-export const store = new weedux(initialState, reducers, [logger, thunk, persist, sagaMiddleware])
+const actionLog = s => n => a => {
+    if (__DEV__) {
+        const oldState = s.getState()
+        n(a)
+        const newState = s.getState()
+        console.info("ACTION - ", a, " STATE - BEFORE:", oldState, " AFTER:", newState)
+    } else {
+        n(a)
+    }
+}
+
+export const store = new weedux(initialState, reducers, [actionLog, persist, sagaMiddleware])
 
 import sagas from './sagas'
 sagaMiddleware.run(sagas)
@@ -56,5 +69,6 @@ export const subscribe = store.subscribe
 export const dispatch = store.dispatch
 export const getState = store.getState
 
-import actionCreators from './actions/index.js'
-export const actions = actionCreators(store.dispatch)
+import a from './actions/index.js'
+
+export const actions = a

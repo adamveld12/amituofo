@@ -6,35 +6,32 @@ import {
   TIMER_EDIT,
   TIMER_EDIT_APPLY,
   AUDIO_STOP,
+  SAVE_STATE,
+  LOAD_STATE,
+  REPLACE_STATE
 } from './types.js'
 
-function wrapDispatch(actionCreator, dispatch) {
-   return function() {
-     dispatch(actionCreator.apply(this, arguments))
-   }
+
+const session = {
+    start: (duration) => ({ type: SESSION_START, duration }),
+    complete: () => ({ type: SESSION_COMPLETE }),
+    pause: () => ({ type: SESSION_PAUSE }),
+    reset: () => ({ type: SESSION_RESET })
 }
 
-const sessionActions = {
-  start: (duration) => ({ type: SESSION_START, duration }),
-  complete: () => ({ type: SESSION_COMPLETE }),
-  pause: () => ({ type: SESSION_PAUSE }),
-  reset: () => ({ type: SESSION_RESET })
+const timer = {
+    edit: (mode) => ({ type: TIMER_EDIT, mode: !!mode }),
+    apply: (duration) => ({ type: TIMER_EDIT_APPLY, duration })
 }
 
-const timerActions = {
-  edit_mode: (mode) => ({ type: TIMER_EDIT, mode: !!mode }),
-  apply_edit: (duration) => ({ type: TIMER_EDIT_APPLY, duration })
+const storage = {
+    save: () => ({ type: SAVE_STATE }),
+    load: () => ({ type: LOAD_STATE }),
+    replace: (state) => ({ type: REPLACE_STATE, state })
 }
 
-export default function actionCreator(dispatch){
-  const actions = {
-    ...sessionActions,
-    ...timerActions,
-  }
-
-  for (var k in actions){
-    actions[k] = wrapDispatch(actions[k], dispatch)
-  }
-
-  return actions
+export default {
+    session,
+    timer,
+    storage
 }

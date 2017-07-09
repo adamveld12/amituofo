@@ -10,8 +10,8 @@ export default class Control extends PureComponent {
     const color = '#F5FCFF'
     return (
       <View style={styles.container}>
-        <FIcon.Button onPress={() => (active ? onPause : onStart)()}
-                      name={active ? "pause" : "play"}
+        <MIcon.Button onPress={() => (active ? onPause : onStart)()}
+                      name={active ? "pause" : "play-arrow"}
                       backgroundColor="transparent"
                       iconStyle={styles.icon}
                       color={color} />
@@ -46,6 +46,7 @@ export default class Control extends PureComponent {
 
   render(){
     const { audioPlaying } = this.props
+
     return audioPlaying ?
       this.renderAudioControl(this.props) :
       this.renderTimerControl(this.props)
@@ -57,14 +58,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: 160,
-    maxHeight: 50,
+    maxHeight: 60,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingLeft: 20,
   },
   icon: {
-    width: 30,
-    height: 30,
+    fontSize: 30,
+    width: 60,
+    height: 60,
     marginRight: 0
   }
 })

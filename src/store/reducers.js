@@ -12,7 +12,8 @@ import {
   AUDIO_FILE_EDIT,
   AUDIO_STOP,
   AUDIO_VOLUME_EDIT,
-  LOAD_STATE,
+  REPLACE_STATE,
+  ANALYTICS_IDENTIFY
 } from './actions/types.js'
 
 const session = (state, action) => {
@@ -73,7 +74,6 @@ const stats = (state, action) => {
       }
 
       ns.stats.completed = state.stats.completed.concat([completedSession])
-      __DEV__ && console.log(completedSession)
       break
     case SESSION_INTERRUPT:
       if (ns.session.active)
@@ -89,7 +89,6 @@ const stats = (state, action) => {
         }
 
         ns.stats.quits = state.stats.quits.concat([prematureEndedSession])
-        __DEV__ && console.log(prematureEndedSession)
       }
       break
   }
@@ -138,16 +137,50 @@ const audio = (state, { type, volume, audioURI }) => {
 const storage = (state, { type, state: loadedState }) => {
   const ns = {...state}
   switch(type){
-    case LOAD_STATE:
-    ns.stats = loadedState.stats
-    //ns.audio = loadedState.audio
-    ns.session = loadedState.session
-    ns.session.active = false
+    case REPLACE_STATE:
+    ns.user = Object.assign(state.user, loadedState.user)
+
+    ns.time = Object.assign(state.time, {
+        edit: false,
+        active: false
+    })
+
+    ns.session = Object.assign(state.session, loadedState.session, {
+        started: false,
+        active: false,
+        completed: false,
+    })
+
+    ns.audio = Object.assign(state.audio, loadedState.audio, {
+        playing: false,
+    })
+
+    ns.stats = Object.assign(state.stats, loadedState.stats)
+
     break
-    // maybe add clear state
   }
 
   return ns
 }
 
-export default [ session, stats, timer_edit, audio, storage ]
+const analytics = (state, { type, identity }) => {
+  const ns = {...state}
+  switch(type){
+    case ANALYTICS_IDENTIFY:
+        ns.user = Object.assign(state.user, identity)
+
+        if (__DEV__){
+            ns.user = {
+                id: `developer-1337`,
+                username: "developer"
+            }
+        }
+
+    break
+  }
+
+  return ns
+
+}
+
+export default [ session, stats, timer_edit, audio, storage, analytics]

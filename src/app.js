@@ -1,70 +1,51 @@
 import React, { Component } from 'react'
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  Button
-} from 'react-native'
-
+import { StyleSheet, View } from 'react-native'
+import { StackNavigator, createNavigationContainer, addNavigationHelpers } from 'react-navigation'
 import AnimatedLinearGradient, {presetColors} from 'react-native-animated-linear-gradient'
 
-import Timer from './Timer'
-import { dispatch, getState, subscribe, actions } from './store'
-//import StatsPage from './statsPage.js'
+import { getState, subscribe, actions, store } from './store'
+import { connect } from 'weedux'
 
-export default class App extends Component {
+import Timer from './Timer'
+
+const Screens = StackNavigator({
+    Timer: { screen: Timer, title: "shit" },
+    //Stats: { screen: Stats, title: "Statistics" },
+    //Timer: { screen: Settings, title: "Settings" },
+},
+{
+    initialRouteName: "Timer",
+    lazy: false,
+    headerMode: "none",
+    mode: "card",
+    cardStyle: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'transparent'
+    }
+})
+
+class App extends Component {
   constructor(){
     super()
     this.state = getState()
   }
 
-  static defaultProps = {
-    dispatch: dispatch
-  }
-
-  componentWillMount(){
-    __DEV__ && console.log("connecting to store")
-    this.__handle__ = subscribe((s, a) =>  this.setState(s))
-  }
-
-  componentWillUnmount(){
-    __DEV__ && console.log("unmounting app")
-    this.__handle__()
+  componentDidMount(){
+      const { load } = this.props
+      load()
   }
 
   render() {
-    const {
-      time: {
-        edit
-      },
-      session: {
-        started,
-        duration,
-        remaining,
-        active
-      },
-      audio
-    } = this.state
     return (
       <View style={styles.container}>
-        <AnimatedLinearGradient customColors={gradientColors} speed={10000}/>
-        <Timer
-           actions={{
-             edit_mode: actions.edit_mode,
-             apply_edit: actions.apply_edit,
-             start: actions.start,
-             pause: actions.pause,
-             reset: actions.reset,
-             complete: actions.complete,
-             stopAudio: actions.stop,
-           }}
-           active={active}
-           started={started}
-           duration={duration}
-           remaining={remaining}
-           edit={edit}
-           audio={audio} />
+        <AnimatedLinearGradient customColors={gradientColors} speed={10000} />
+        <Screens style={{
+            flex: 1,
+            width: '100%',
+            height: '100%'
+        }} />
       </View>
     )
   }
@@ -85,3 +66,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   }
 })
+
+export default connect(
+    (state) => state,
+    (dispatch) => ({
+        load: () => dispatch(actions.storage.load())
+    }),
+    store
+)(App)

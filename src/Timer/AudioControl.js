@@ -5,6 +5,7 @@ import {
   Text,
   View
 } from 'react-native'
+import PropTypes from 'prop-types'
 
 export default class AudioControl extends PureComponent {
   constructor(){
@@ -12,16 +13,16 @@ export default class AudioControl extends PureComponent {
     this.state = { loaded: "singing_gong.mp3" }
   }
 
+  static propTypes = {
+      audioURI: PropTypes.string.isRequired,
+  }
 
   render(){
     const {
-      playing,
-      active,
-      finalVolume,
       audioURI
     } = this.props
 
-    const audioTitle =  audioURI.split('_').map((x) => x[0].toUpperCase() + x.substr(1)).join(' ').replace(/\.mp3/, '')
+    const audioTitle =  toTitle(audioURI)
 
     return (
       <View style={styles.container}>
@@ -31,6 +32,10 @@ export default class AudioControl extends PureComponent {
       </View>
     )
   }
+}
+
+function toTitle(audioURI){
+    return audioURI.split('_').map((x) => x[0].toUpperCase() + x.substr(1)).join(' ').replace(/\.mp3/, '')
 }
 
 const styles = StyleSheet.create({

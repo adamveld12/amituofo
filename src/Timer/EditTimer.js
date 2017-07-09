@@ -1,28 +1,49 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { Platform, StyleSheet, TextInput, View } from 'react-native'
 import FIcon from 'react-native-vector-icons/FontAwesome'
 import EIcon from 'react-native-vector-icons/EvilIcons'
 import MIcon from 'react-native-vector-icons/MaterialIcons'
+import PropTypes from 'prop-types'
 
 import { sprintf } from 'sprintf'
 
-export default class EditCounter extends PureComponent {
+export default class EditCounter extends Component {
   constructor(){
     super()
     this.state = { minutes: 0 }
   }
 
-  startEdit(){
-    const { duration, edit_mode } = this.props
+  static propTypes = {
+      duration: PropTypes.number.isRequired,
+      cancel: PropTypes.func.isRequired,
+      apply: PropTypes.func.isRequired
+  }
+
+  syncState = () => {
+    const { duration } = this.props
     const minutes = Math.floor(duration / 60)
     this.setState({ minutes })
+  }
+
+  startEdit(){
+    this.syncState()
+    const { edit_mode } = this.props
     edit_mode(true)
   }
 
   componentDidMount(){
-    const { duration, edit_mode } = this.props
-    const minutes = Math.floor(duration / 60)
-    this.setState({ minutes })
+      this.syncState()
+  }
+
+  shouldComponentUpdate(nextProps, nextState){
+      const { nduration } = nextProps
+      const { duration } = this.props
+
+
+      const { nminutes } = nextState
+      const { minutes } = this.state
+
+      return nduration !== duration || nminutes !== minutes
   }
 
   render(){
@@ -78,7 +99,7 @@ export default class EditCounter extends PureComponent {
   }
 }
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   icon:{
     marginRight: 0,
     justifyContent: 'center',
