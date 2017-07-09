@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { Platform, StyleSheet, TextInput, View } from 'react-native'
 import FIcon from 'react-native-vector-icons/FontAwesome'
 import EIcon from 'react-native-vector-icons/EvilIcons'
@@ -7,10 +7,16 @@ import PropTypes from 'prop-types'
 
 import { sprintf } from 'sprintf'
 
-export default class EditCounter extends PureComponent {
+export default class EditCounter extends Component {
   constructor(){
     super()
     this.state = { minutes: 0 }
+  }
+
+  static propTypes = {
+      duration: PropTypes.number.isRequired,
+      cancel: PropTypes.func.isRequired,
+      apply: PropTypes.func.isRequired
   }
 
   syncState = () => {
@@ -91,12 +97,6 @@ export default class EditCounter extends PureComponent {
       </View>
     )
   }
-}
-
-EditCounter.propTypes = {
-    duration: PropTypes.number.isRequired,
-    cancel: PropTypes.func.isRequired,
-    apply: PropTypes.func.isRequired
 }
 
 const styles = StyleSheet.create({

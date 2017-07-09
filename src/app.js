@@ -1,49 +1,51 @@
 import React, { Component } from 'react'
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  Button
-} from 'react-native'
-import { StackNavigator } from 'react-navigation'
-
+import { StyleSheet, View } from 'react-native'
+import { StackNavigator, createNavigationContainer, addNavigationHelpers } from 'react-navigation'
 import AnimatedLinearGradient, {presetColors} from 'react-native-animated-linear-gradient'
 
+import { getState, subscribe, actions, store } from './store'
+import { connect } from 'weedux'
+
 import Timer from './Timer'
-import { dispatch, getState, subscribe, actions } from './store'
-//import StatsPage from './statsPage.js'
 
-
-const screens = StackNavigator({
-    Timer: { screen: Timer, title: "Timer" },
+const Screens = StackNavigator({
+    Timer: { screen: Timer, title: "shit" },
     //Stats: { screen: Stats, title: "Statistics" },
     //Timer: { screen: Settings, title: "Settings" },
+},
+{
+    initialRouteName: "Timer",
+    lazy: false,
+    headerMode: "none",
+    mode: "card",
+    cardStyle: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'transparent'
+    }
 })
 
-export default class App extends Component {
+class App extends Component {
   constructor(){
     super()
     this.state = getState()
   }
 
-  componentWillMount(){
-    this.__handle__ = subscribe((s, a) =>  this.setState(s))
-  }
-
   componentDidMount(){
-      actions.load()
-  }
-
-  componentWillUnmount(){
-    this.__handle__()
+      const { load } = this.props
+      load()
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <AnimatedLinearGradient customColors={gradientColors} speed={10000}/>
-        <Timer {...this.state} />
+        <AnimatedLinearGradient customColors={gradientColors} speed={10000} />
+        <Screens style={{
+            flex: 1,
+            width: '100%',
+            height: '100%'
+        }} />
       </View>
     )
   }
@@ -64,3 +66,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   }
 })
+
+export default connect(
+    (state) => state,
+    (dispatch) => ({
+        load: () => dispatch(actions.storage.load())
+    }),
+    store
+)(App)

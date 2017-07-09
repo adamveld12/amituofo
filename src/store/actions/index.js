@@ -20,8 +20,8 @@ const session = {
 }
 
 const timer = {
-    edit_mode: (mode) => ({ type: TIMER_EDIT, mode: !!mode }),
-    apply_edit: (duration) => ({ type: TIMER_EDIT_APPLY, duration })
+    edit: (mode) => ({ type: TIMER_EDIT, mode: !!mode }),
+    apply: (duration) => ({ type: TIMER_EDIT_APPLY, duration })
 }
 
 const storage = {
@@ -30,23 +30,8 @@ const storage = {
     replace: (state) => ({ type: REPLACE_STATE, state })
 }
 
-function wrapDispatch(action, dispatch) {
-    return function(){
-        return dispatch(action.apply(this, arguments))
-    }
+export default {
+    session,
+    timer,
+    storage
 }
-
-function wrapActions(actions, dispatch){
-    const result = {}
-    for (var k in actions){
-        result[k] = wrapDispatch(actions[k], dispatch)
-    }
-
-    return result
-}
-
-export default (dispatch) => ({
-    ...wrapActions(session, dispatch),
-    ...wrapActions(timer, dispatch),
-    ...wrapActions(storage, dispatch)
-})

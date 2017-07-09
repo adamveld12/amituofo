@@ -8,25 +8,55 @@ import {
 } from 'react-native'
 import PropTypes from 'prop-types'
 
-import { actions }  from '../store'
-
-import Control from './Control'
 import AudioControl from './AudioControl'
 import EditTimer from './EditTimer'
 import CountdownTimer from './CountdownTimer'
 import Progress from './Progress'
+import { actions, store } from '../store'
+import { connect } from 'weedux'
 
-import Timer from './Timer.js'
+import AnimatedLinearGradient, {presetColors} from 'react-native-animated-linear-gradient'
+const gradientColors = [
+  '#ca9ebc',
+  '#b992ad',
+  '#877481',
+  '#a57b53'
+]
 
-export default class TimerContainerComponent extends Component {
+class TimerContainerComponent extends Component {
     static navigationOptions = {
         title: "Timer"
     }
 
+    static propTypes = {
+        onStart: PropTypes.func.isRequired,
+        onPause: PropTypes.func.isRequired,
+        onReset: PropTypes.func.isRequired,
+        onEditMode: PropTypes.func.isRequired,
+        onCancelEdit: PropTypes.func.isRequired,
+        onApplyEdit: PropTypes.func.isRequired,
+        time: PropTypes.shape({
+            edit: PropTypes.bool.isRequired
+        }).isRequired,
+        session: PropTypes.shape({
+            started: PropTypes.bool.isRequired,
+            active: PropTypes.bool.isRequired,
+            duration: PropTypes.number.isRequired,
+            remaining: PropTypes.number.isRequired,
+        }),
+        audio: PropTypes.shape({
+            audioURI: PropTypes.string.isRequired,
+            playing: PropTypes.bool.isRequired,
+            finalVolume: PropTypes.number.isRequired,
+            rampTime: PropTypes.number.isRequired,
+        }).isRequired
+    }
+
+
     _handleStateChange = (nextState) => {
         if (nextState.match(/inactive|background/)) {
-              const { actions : { pause } } = this.props
-              pause()
+              const { onPause } = this.props
+              onPause()
         }
     }
 
@@ -34,17 +64,13 @@ export default class TimerContainerComponent extends Component {
     componentWillUnmount = () => AppState.removeEventListener('change', this._handleStateChange)
 
     render(){
-        const actionProps = {
-             edit_mode: actions.edit_mode,
-             apply_edit: actions.apply_edit,
-             start: actions.start,
-             pause: actions.pause,
-             reset: actions.reset,
-             complete: actions.complete,
-             stopAudio: actions.stop,
-       }
-
         const {
+            onStart,
+            onPause,
+            onReset,
+            onEditMode,
+            onCancelEdit,
+            onApplyEdit,
             time: {
                 edit
             },
@@ -57,30 +83,64 @@ export default class TimerContainerComponent extends Component {
             audio
         } = this.props
 
-        return (<Timer actions={actionProps}
-                        edit={edit}
-                        duration={duration}
-                        started={started}
-                        remaining={remaining}
-                        active={active}
-                        audio={audio} />)
+        return (
+          <View style={styles.container}>
+            <Progress duration={duration} edit={edit} remaining={remaining} >
+              {
+                  edit ?
+                   (<EditTimer duration={duration}
+                               cancel={() => onCancelEdit(edit)}
+                               apply={onApplyEdit} />)
+                   :
+                  (<CountdownTimer onEditMode={() => onEditMode(edit)}
+                                   onStart={() => onStart(remaining, edit)}
+                                   onPause={() => onPause(edit)}
+                                   onReset={() => onReset(edit)}
+                                   audioPlaying={audio.playing}
+                                   active={active}
+                                   duration={duration}
+                                   remaining={remaining} />)
+              }
+            </Progress>
+
+            <AudioControl {...audio} />
+          </View>
+        )
     }
 }
 
-TimerContainerComponent.propTypes = {
-    time: PropTypes.shape({
-        edit: PropTypes.bool.isRequired
-    }).isRequired,
-    session: PropTypes.shape({
-        started: PropTypes.bool.isRequired,
-        active: PropTypes.bool.isRequired,
-        duration: PropTypes.number.isRequired,
-        remaining: PropTypes.number.isRequired,
-    }),
-    audio: PropTypes.shape({
-        audioURI: PropTypes.string.isRequired,
-        playing: PropTypes.bool.isRequired,
-        finalVolume: PropTypes.number.isRequired,
-        rampTime: PropTypes.number.isRequired,
-    }).isRequired
-}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    marginTop: 100,
+    ...Platform.select({
+      android: {
+          marginTop: 50,
+          marginBottom: 50,
+      }
+    })
+  }
+})
+
+export default connect(
+    (state, props) => ({ ...props, ...state }),
+    (dispatch, props, state) => {
+        const {
+            session,
+            timer
+        } = actions
+
+        return ({
+            onStart: (remaining, editMode) => (!editMode && dispatch(session.start(remaining))),
+            onPause: (editMode) => !editMode && dispatch(session.pause()),
+            onReset: (editMode) => !editMode && dispatch(session.reset()),
+            onEditMode: (editMode) => !editMode && dispatch(timer.edit(true)),
+            onCancelEdit: (editMode) => editMode && dispatch(timer.edit(false)),
+            onApplyEdit: (duration) => dispatch(timer.apply(duration))
+        })
+    },
+    store
+)(TimerContainerComponent)

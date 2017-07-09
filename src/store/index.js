@@ -1,3 +1,4 @@
+import React from 'react'
 import weedux, { middleware } from 'weedux'
 import { AsyncStorage } from 'react-native'
 import reducers from './reducers'
@@ -7,10 +8,7 @@ import { v4 } from 'uuid'
 const { thunk, logger } = middleware
 
 export const initialState = {
-  user: {
-      id: v4(),
-      username: "user",
-  },
+  user: {},
   time: {
       // if timer is in edit mode
     edit: false,
@@ -71,5 +69,6 @@ export const subscribe = store.subscribe
 export const dispatch = store.dispatch
 export const getState = store.getState
 
-import actionCreators from './actions/index.js'
-export const actions = actionCreators(store.dispatch)
+import a from './actions/index.js'
+
+export const actions = a

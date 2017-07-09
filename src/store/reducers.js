@@ -13,6 +13,7 @@ import {
   AUDIO_STOP,
   AUDIO_VOLUME_EDIT,
   REPLACE_STATE,
+  ANALYTICS_IDENTIFY
 } from './actions/types.js'
 
 const session = (state, action) => {
@@ -156,17 +157,30 @@ const storage = (state, { type, state: loadedState }) => {
 
     ns.stats = Object.assign(state.stats, loadedState.stats)
 
-    if (__DEV__){
-        ns.user = {
-            userID: `developer-1337`,
-            username: "developer"
-        }
-    }
-
     break
   }
 
   return ns
 }
 
-export default [ session, stats, timer_edit, audio, storage ]
+const analytics = (state, { type, identity }) => {
+  const ns = {...state}
+  switch(type){
+    case ANALYTICS_IDENTIFY:
+        ns.user = Object.assign(state.user, identity)
+
+        if (__DEV__){
+            ns.user = {
+                id: `developer-1337`,
+                username: "developer"
+            }
+        }
+
+    break
+  }
+
+  return ns
+
+}
+
+export default [ session, stats, timer_edit, audio, storage, analytics]

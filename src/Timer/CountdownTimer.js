@@ -11,8 +11,15 @@ import isEqual from 'lodash.isequal'
 import Control from './Control'
 
 export default class CountdownTimer extends PureComponent {
-    shouldComponentUpdate(nextProps, nextState){
-        return !isEqual(nextProps, this.props)
+    static propTypes = {
+        remaining: PropTypes.number.isRequired,
+        duration: PropTypes.number.isRequired,
+        onEditMode: PropTypes.func.isRequired,
+        onStart: PropTypes.func.isRequired,
+        onPause: PropTypes.func.isRequired,
+        onReset: PropTypes.func.isRequired,
+        active: PropTypes.bool.isRequired,
+        audioPlaying: PropTypes.bool.isRequired
     }
 
     render(){
@@ -47,16 +54,6 @@ export default class CountdownTimer extends PureComponent {
     }
 }
 
-CountdownTimer.propTypes = {
-    remaining: PropTypes.number.isRequired,
-    duration: PropTypes.number.isRequired,
-    onEditMode: PropTypes.func.isRequired,
-    onStart: PropTypes.func.isRequired,
-    onPause: PropTypes.func.isRequired,
-    onReset: PropTypes.func.isRequired,
-    active: PropTypes.bool.isRequired,
-    audioPlaying: PropTypes.bool.isRequired
-}
 
 
 export const styles = StyleSheet.create({

@@ -6,6 +6,7 @@ import {
     LOAD_STATE,
     SAVE_STATE,
     CLEAR_STATE,
+    LOAD_STATE_FINISHED,
     REPLACE_STATE
 } from '../actions/types.js'
 
@@ -13,9 +14,11 @@ function* load(stateKey){
     const stateJSON = yield call(AsyncStorage.getItem, stateKey)
     const newState = JSON.parse(stateJSON)
     __DEV__ && console.log("loading state:", newState)
-    if (stateJSON !== ""){
+    if (newState !== null){
         yield put({ type: REPLACE_STATE, state: newState })
     }
+
+    yield put({ type: LOAD_STATE_FINISHED })
 }
 
 function* save(stateKey){
@@ -25,7 +28,7 @@ function* save(stateKey){
 
 export default function* startStorageSaga(){
     const stateKey = "@amituofo:state"
-    var result
+    var result = null
     try {
         while(true){
             result = yield race ({
