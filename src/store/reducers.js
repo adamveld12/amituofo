@@ -7,6 +7,7 @@ import {
   SESSION_INTERRUPT,
   SESSION_QUIT,
   TIMER_EDIT_APPLY,
+  TIMER_EDIT_UPDATE,
   TIMER_EDIT,
   AUDIO_PLAY,
   AUDIO_FILE_EDIT,
@@ -36,7 +37,7 @@ const session = (state, action) => {
       ns.session.active = false
       break
     case SESSION_RESET:
-      ns.time.edit = false
+      ns.timer.edit = false
       ns.session = {
         ...session,
         started: false,
@@ -103,13 +104,17 @@ const timer_edit = (state, { type, duration, mode }) => {
     case TIMER_EDIT_APPLY:
       ns.session = {
         ...session,
-        duration,
-        remaining: duration,
+        duration: ns.timer.minutes * 60,
+        remaining: ns.timer.minutes * 60,
       }
-      ns.time.edit = false
+      ns.timer.edit = false
       break
     case TIMER_EDIT:
-      ns.time.edit = mode
+      ns.timer.edit = mode
+      ns.timer.minutes = Math.floor(ns.session.duration / 60)
+      break
+    case TIMER_EDIT_UPDATE:
+      ns.timer.minutes = duration
       break
   }
   return ns
@@ -140,9 +145,8 @@ const storage = (state, { type, state: loadedState }) => {
     case REPLACE_STATE:
     ns.user = Object.assign(state.user, loadedState.user)
 
-    ns.time = Object.assign(state.time, {
-        edit: false,
-        active: false
+    ns.timer = Object.assign(state.timer, {
+        edit: false
     })
 
     ns.session = Object.assign(state.session, loadedState.session, {

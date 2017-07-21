@@ -9,10 +9,10 @@ const { thunk, logger } = middleware
 
 export const initialState = {
   user: {},
-  time: {
+  timer: {
       // if timer is in edit mode
     edit: false,
-    active: false,
+    minutes: 0,
   },
   session: {
     // if a countdown was started

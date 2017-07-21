@@ -4,6 +4,7 @@ import {
   SESSION_PAUSE,
   SESSION_RESET,
   TIMER_EDIT,
+  TIMER_EDIT_UPDATE,
   TIMER_EDIT_APPLY,
   AUDIO_STOP,
   SAVE_STATE,
@@ -21,7 +22,8 @@ const session = {
 
 const timer = {
     edit: (mode) => ({ type: TIMER_EDIT, mode: !!mode }),
-    apply: (duration) => ({ type: TIMER_EDIT_APPLY, duration })
+    apply: (duration) => ({ type: TIMER_EDIT_APPLY, duration }),
+    update: (duration) => ({ type: TIMER_EDIT_UPDATE, duration })
 }
 
 const storage = {

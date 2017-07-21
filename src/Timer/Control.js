@@ -1,72 +1,45 @@
 import React, { PureComponent } from 'react'
-import { Button, StyleSheet, View } from 'react-native'
+import PropTypes from 'prop-types'
 
-import FIcon from 'react-native-vector-icons/FontAwesome'
-import EIcon from 'react-native-vector-icons/EvilIcons'
-import MIcon from 'react-native-vector-icons/MaterialIcons'
+import {
+    CompletedTimerControl,
+    CountdownTimerControl,
+    EditTimerControl
+} from '../components'
 
 export default class Control extends PureComponent {
-  renderTimerControl({ active, onPause, onStart, onReset }){
-    const color = '#F5FCFF'
-    return (
-      <View style={styles.container}>
-        <MIcon.Button onPress={() => (active ? onPause : onStart)()}
-                      name={active ? "pause" : "play-arrow"}
-                      backgroundColor="transparent"
-                      iconStyle={styles.icon}
-                      color={color} />
+    static propTypes = {
+        active: PropTypes.bool.isRequired,
+        audioPlaying: PropTypes.bool.isRequired,
+        editMode: PropTypes.bool.isRequired,
+        onPause: PropTypes.func.isRequired,
+        onStart: PropTypes.func.isRequired,
+        onCancel: PropTypes.func.isRequired,
+        onReset: PropTypes.func.isRequired,
+    }
 
-        <MIcon.Button onPress={onReset}
-                       name="autorenew"
-                       backgroundColor="transparent"
-                       iconStyle={styles.icon}
-                       color={color} />
-      </View>
-    )
-  }
+    render(){
+        const {
+            active,
+            audioPlaying,
+            editMode,
+            onApply,
+            onCancel,
+            onPause,
+            onStart,
+            onReset
+        } = this.props
 
-  renderAudioControl({ onReset }){
-    const color = '#F5FCFF'
-    return (
-      <View style={styles.container}>
-          <MIcon.Button onPress={onReset}
-                        iconStyle={styles.icon}
-                        name="check"
-                        color="#7FFF00"
-                        backgroundColor="transparent" />
+        if (audioPlaying) {
+            return (<CompletedTimerControl onReset={onReset} />)
 
-          <MIcon.Button onPress={onReset}
-                        name="autorenew"
-                        backgroundColor="transparent"
-                        iconStyle={styles.icon}
-                        color={color} />
-      </View>
-    )
-  }
-
-  render(){
-    const { audioPlaying } = this.props
-
-    return audioPlaying ?
-      this.renderAudioControl(this.props) :
-      this.renderTimerControl(this.props)
-  }
+        } else if (editMode) {
+            return (<EditTimerControl onApply={onApply} onCancel={onCancel} />)
+        } else {
+            return (<CountdownTimerControl active={active}
+                                  onPause={onPause}
+                                  onStart={onStart}
+                                  onReset={onReset} />)
+        }
+    }
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: 160,
-    maxHeight: 60,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingLeft: 20,
-  },
-  icon: {
-    fontSize: 30,
-    width: 60,
-    height: 60,
-    marginRight: 0
-  }
-})

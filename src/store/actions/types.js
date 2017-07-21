@@ -7,6 +7,7 @@ export const SESSION_COMPLETE = "SESSION_COMPLETE"
 export const SESSION_QUIT = "SESSION_QUIT"
 
 export const TIMER_EDIT_APPLY = "TIMER_EDIT_APPLY"
+export const TIMER_EDIT_UPDATE = "TIMER_EDIT_UPDATE"
 export const TIMER_EDIT = "TIMER_EDIT"
 
 export const AUDIO_PLAY = "AUDIO_PLAY"

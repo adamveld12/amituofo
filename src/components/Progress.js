@@ -1,11 +1,4 @@
 import React, { PureComponent } from 'react'
-import {
-  AppState,
-  StyleSheet,
-  Platform,
-  View,
-  Text
-} from 'react-native'
 import { AnimatedCircularProgress } from 'react-native-circular-progress'
 import PropTypes from 'prop-types'
 
@@ -14,7 +7,7 @@ export default class Progress extends PureComponent {
         children: PropTypes.object.isRequired,
         duration: PropTypes.number.isRequired,
         remaining: PropTypes.number.isRequired,
-        edit: PropTypes.bool.isRequired,
+        editMode: PropTypes.bool.isRequired,
     }
 
     render(){
@@ -22,10 +15,10 @@ export default class Progress extends PureComponent {
             children,
             duration,
             remaining,
-            edit
+            editMode
         } = this.props
 
-        const fill = edit ? 100 : remaining/duration * 100
+        const fill = editMode ? 100 : remaining/duration * 100
 
         return (
             <AnimatedCircularProgress size={300}

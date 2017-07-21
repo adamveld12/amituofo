@@ -34,13 +34,13 @@ class App extends Component {
 
   componentDidMount(){
       const { load } = this.props
-      load()
+      if(!__DEV__)
+          load()
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <AnimatedLinearGradient customColors={gradientColors} speed={10000} />
         <Screens style={{
             flex: 1,
             width: '100%',
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'white',
   }
 })
 

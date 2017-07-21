@@ -4,14 +4,13 @@ import {
   StyleSheet,
   Platform,
   View,
-  Text
 } from 'react-native'
 import PropTypes from 'prop-types'
 
 import AudioControl from './AudioControl'
-import EditTimer from './EditTimer'
-import CountdownTimer from './CountdownTimer'
-import Progress from './Progress'
+import TimerDisplay from './TimerDisplay'
+import Control from './Control'
+
 import { actions, store } from '../store'
 import { connect } from 'weedux'
 
@@ -23,21 +22,23 @@ class TimerContainerComponent extends Component {
     }
 
     static propTypes = {
-        onStart: PropTypes.func.isRequired,
-        onPause: PropTypes.func.isRequired,
-        onReset: PropTypes.func.isRequired,
-        onEditMode: PropTypes.func.isRequired,
-        onCancelEdit: PropTypes.func.isRequired,
-        onApplyEdit: PropTypes.func.isRequired,
-        time: PropTypes.shape({
+        actions: PropTypes.shape({
+            onStart: PropTypes.func.isRequired,
+            onPause: PropTypes.func.isRequired,
+            onReset: PropTypes.func.isRequired,
+            onStartEditMode: PropTypes.func.isRequired,
+            onCancelEdit: PropTypes.func.isRequired,
+            onApplyEdit: PropTypes.func.isRequired,
+            onUpdateEdit: PropTypes.func.isRequired,
+        }).isRequired,
+        timer: PropTypes.shape({
             edit: PropTypes.bool.isRequired
         }).isRequired,
         session: PropTypes.shape({
-            started: PropTypes.bool.isRequired,
             active: PropTypes.bool.isRequired,
             duration: PropTypes.number.isRequired,
             remaining: PropTypes.number.isRequired,
-        }),
+        }).isRequired,
         audio: PropTypes.shape({
             audioURI: PropTypes.string.isRequired,
             playing: PropTypes.bool.isRequired,
@@ -46,11 +47,10 @@ class TimerContainerComponent extends Component {
         }).isRequired
     }
 
-
     _handleStateChange = (nextState) => {
         if (nextState.match(/inactive|background/)) {
-              const { onPause } = this.props
-              onPause()
+              const { actions: { onPause }, timer: { edit } } = this.props
+              onPause()()
         }
     }
 
@@ -65,17 +65,20 @@ class TimerContainerComponent extends Component {
 
     render(){
         const {
-            onStart,
-            onPause,
-            onReset,
-            onEditMode,
-            onCancelEdit,
-            onApplyEdit,
-            time: {
-                edit
+            actions: {
+                onStart,
+                onPause,
+                onReset,
+                onStartEditMode,
+                onCancelEdit,
+                onApplyEdit,
+                onUpdateEdit,
+            },
+            timer: {
+                edit,
+                minutes,
             },
             session: {
-                started,
                 duration,
                 remaining,
                 active
@@ -83,46 +86,68 @@ class TimerContainerComponent extends Component {
             audio
         } = this.props
 
+
         return (
           <View style={styles.container}>
-            <Progress duration={duration} edit={edit} remaining={remaining} >
-              {
-                  edit ?
-                   (<EditTimer duration={duration}
-                               cancel={() => onCancelEdit(edit)}
-                               apply={onApplyEdit} />)
-                   :
-                  (<CountdownTimer onEditMode={() => onEditMode(edit)}
-                                   onStart={() => onStart(remaining, edit)}
-                                   onPause={() => onPause(edit)}
-                                   onReset={() => onReset(edit)}
-                                   audioPlaying={audio.playing}
-                                   active={active}
-                                   duration={duration}
-                                   remaining={remaining} />)
-              }
-            </Progress>
+            <View style={styles.timer_container}>
+                <TimerDisplay active={active}
+                              audioPlaying={audio.playing}
+                              editMode={edit}
+                              duration={duration}
+                              minutes={minutes}
+                              onUpdateEdit={onUpdateEdit}
+                              onApplyEdit={() => onApplyEdit(minutes)}
+                              onStartEditMode={onStartEditMode}
+                              onCancelEdit={onCancelEdit}
+                              remaining={remaining} />
+            </View>
 
-            <AudioControl {...audio} />
+            <View style={styles.audio_container}>
+                <AudioControl {...audio} />
+            </View>
+
+            <View style={styles.control_container}>
+                <Control audioPlaying={audio.playing}
+                        active={active}
+                        editMode={edit}
+                        onApply={() => onApplyEdit(minutes)}
+                        onStart={() => onStart(remaining, edit)}
+                        onCancel={onCancelEdit}
+                        onPause={onPause}
+                        onReset={onReset} />
+            </View>
           </View>
         )
     }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-    marginTop: 100,
-    ...Platform.select({
-      android: {
-          marginTop: 50,
-          marginBottom: 50,
-      }
-    })
-  }
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white',
+    },
+    timer_container: {
+        flex: 6,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        width: '100%'
+    },
+    audio_container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        width: '100%'
+    },
+    control_container: {
+        flex: 3,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%'
+    }
 })
 
 export default connect(
@@ -133,25 +158,29 @@ export default connect(
             timer
         } = actions
 
-        return ({
-            onStart: (remaining, editMode) => {
+        const viewActions = ({
+            onUpdateEdit: (duration) => {
+                dispatch(timer.update(duration))
+                KeepAwake.deactivate()
+            },
+            onStart: (remaining, editMode) =>  {
                 !editMode && dispatch(session.start(remaining))
                 KeepAwake.activate()
             },
-            onPause: (editMode) => {
-                !editMode && dispatch(session.pause())
+            onPause: () => {
+                 dispatch(session.pause())
                 KeepAwake.deactivate()
             },
-            onReset: (editMode) => {
-                !editMode && dispatch(session.reset())
+            onReset: () => {
+                dispatch(session.reset())
                 KeepAwake.deactivate()
             },
-            onEditMode: (editMode) => {
-                !editMode && dispatch(timer.edit(true))
+            onStartEditMode: () => {
+                dispatch(timer.edit(true))
                 KeepAwake.deactivate()
             },
-            onCancelEdit: (editMode) => {
-                editMode && dispatch(timer.edit(false))
+            onCancelEdit: () => {
+                dispatch(timer.edit(false))
                 KeepAwake.deactivate()
             },
             onApplyEdit: (duration) => {
@@ -159,6 +188,7 @@ export default connect(
                 KeepAwake.deactivate()
             }
         })
+        return { actions: viewActions }
     },
     store
 )(TimerContainerComponent)

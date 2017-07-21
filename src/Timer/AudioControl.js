@@ -43,11 +43,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'transparent',
-    marginTop: 10,
-    marginBottom: 50
+    backgroundColor: 'transparent'
   },
   soundLabel: {
-    color: '#F5FCFF'
+    color: 'black'
   }
 })
