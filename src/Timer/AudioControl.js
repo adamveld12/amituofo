@@ -1,18 +1,18 @@
 import React, { PureComponent } from 'react'
 import {
-  TouchableNativeFeedback,
   StyleSheet,
   Text,
   View
 } from 'react-native'
 import PropTypes from 'prop-types'
 
-export default class AudioControl extends PureComponent {
-  constructor(){
-    super()
-    this.state = { loaded: "singing_gong.mp3" }
-  }
+import FAIcon from 'react-native-vector-icons/FontAwesome'
 
+export default class AudioControl extends PureComponent {
+  // eslint-disable-next-line 
+  state = { loaded: "singing_gong.mp3" }
+
+  // eslint-disable-next-line 
   static propTypes = {
       audioURI: PropTypes.string.isRequired,
   }
@@ -26,6 +26,7 @@ export default class AudioControl extends PureComponent {
 
     return (
       <View style={styles.container}>
+        <FAIcon name="volume-up" size={30} color="black" />
         <Text style={styles.soundLabel}>
           { audioTitle }
         </Text>
@@ -41,11 +42,14 @@ function toTitle(audioURI){
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    width: '90%',
   },
   soundLabel: {
-    color: 'black'
+    color: 'black',
+    fontSize: 18
   }
 })

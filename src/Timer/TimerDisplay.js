@@ -1,11 +1,9 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 
-import {
-    EditTimerDisplay,
-    CountdownTimerDisplay,
-    Progress
-} from '../components'
+import EditTimerDisplay from './EditTimerDisplay'
+import CountdownTimerDisplay from './CountdownTimerDisplay'
+import Progress from './Progress'
 
 export default class TimerDisplay extends PureComponent {
     static propTypes = {

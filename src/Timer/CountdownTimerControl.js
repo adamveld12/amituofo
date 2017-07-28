@@ -9,7 +9,9 @@ export default class CountdownTimerControl extends PureComponent {
         active: PropTypes.bool.isRequired,
         onPause: PropTypes.func.isRequired,
         onStart: PropTypes.func.isRequired,
-        onReset: PropTypes.func.isRequired
+        onReset: PropTypes.func.isRequired,
+        container: PropTypes.object,
+        icon: PropTypes.object,
     }
 
   render(){
@@ -17,42 +19,26 @@ export default class CountdownTimerControl extends PureComponent {
         active,
         onPause,
         onStart,
-        onReset
+        onReset,
+        container,
+        icon
     } = this.props
 
     const color = '#F5FCFF'
     return (
-      <View style={styles.container}>
+      <View style={container}>
         <MIcon.Button onPress={() => (active ? onPause : onStart)()}
                       name={active ? "pause" : "play-arrow"}
                       backgroundColor="transparent"
-                      iconStyle={styles.icon}
+                      iconStyle={icon}
                       color={color} />
 
         <MIcon.Button onPress={onReset}
                        name="autorenew"
                        backgroundColor="transparent"
-                       iconStyle={styles.icon}
+                       iconStyle={icon}
                        color={color} />
       </View>
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: 160,
-    maxHeight: 60,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingLeft: 20,
-  },
-  icon: {
-    fontSize: 30,
-    width: 60,
-    height: 60,
-    marginRight: 0,
-    color: 'black'
-  }
-})

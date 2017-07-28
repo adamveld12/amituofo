@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import PropTypes from 'prop-types'
 
 import MIcon from 'react-native-vector-icons/MaterialIcons'
@@ -8,24 +8,28 @@ export default class TimerEditControl extends PureComponent {
     static propTypes = {
         onApply: PropTypes.func.isRequired,
         onCancel: PropTypes.func.isRequired,
+        container: PropTypes.object,
+        icon: PropTypes.object,
     }
 
     render(){
         const {
             onApply,
             onCancel,
+            container,
+            icon
         } = this.props
 
         return (
-            <View style={styles.container}>
+            <View style={container}>
               <MIcon.Button onPress={onApply}
-                            iconStyle={styles.icon}
+                            iconStyle={icon}
                             name="check"
                             color="#7FFF00"
                             backgroundColor="transparent" />
 
               <MIcon.Button onPress={onCancel}
-                            iconStyle={styles.icon}
+                            iconStyle={icon}
                             name="close"
                             color="red"
                             backgroundColor="transparent" />
@@ -33,22 +37,3 @@ export default class TimerEditControl extends PureComponent {
         )
     }
 }
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: 160,
-    maxHeight: 60,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingLeft: 20,
-  },
-  icon: {
-    fontSize: 30,
-    width: 60,
-    height: 60,
-    marginRight: 0,
-    color: 'black'
-  }
-})

@@ -1,22 +1,18 @@
 import React, { Component } from 'react'
-import { AppState, StyleSheet, View, } from 'react-native'
+import {
+  AppState,
+  StyleSheet,
+  Platform,
+  View,
+} from 'react-native'
 import PropTypes from 'prop-types'
-import FAIcon from 'react-native-vector-icons/FontAwesome'
-
-import AudioControl from './AudioControl'
-import TimerDisplay from './TimerDisplay'
-import Control from './Control'
-import NavigationControl from './NavigationControl'
-
 
 import { actions, store } from '../store'
 import { connect } from 'weedux'
 
-import KeepAwake from 'react-native-keep-awake'
-
-class TimerContainerComponent extends Component {
+class SettingsContainerComponent extends Component {
     static navigationOptions = {
-        title: "Timer"
+        title: "Settings"
     }
 
     static propTypes = {
@@ -42,27 +38,7 @@ class TimerContainerComponent extends Component {
             playing: PropTypes.bool.isRequired,
             finalVolume: PropTypes.number.isRequired,
             rampTime: PropTypes.number.isRequired,
-        }).isRequired,
-        navigation: PropTypes.shape({
-            Settings: PropTypes.func.isRequired,
-            //Stats: PropTypes.func.isRequired,
-        })
-    }
-
-    _handleStateChange = (nextState) => {
-        if (nextState.match(/inactive|background/)) {
-              const { actions: { onPause }, timer: { edit } } = this.props
-              onPause()()
-        }
-    }
-
-    componentDidMount() {
-        AppState.addEventListener('change', this._handleStateChange)
-    }
-
-    componentWillUnmount() {
-        AppState.removeEventListener('change', this._handleStateChange)
-        KeepAwake.deactivate()
+        }).isRequired
     }
 
     render(){
@@ -85,41 +61,12 @@ class TimerContainerComponent extends Component {
                 remaining,
                 active
             },
-            audio,
-            navigation
+            audio
         } = this.props
 
 
         return (
           <View style={styles.container}>
-            <View style={styles.timer_container}>
-                <NavigationControl navigation={navigation} currentScreen={TimerContainerComponent.navigationOptions.title} />
-                <TimerDisplay active={active}
-                              audioPlaying={audio.playing}
-                              editMode={edit}
-                              duration={duration}
-                              minutes={minutes}
-                              onUpdateEdit={onUpdateEdit}
-                              onApplyEdit={() => onApplyEdit(minutes)}
-                              onStartEditMode={onStartEditMode}
-                              onCancelEdit={onCancelEdit}
-                              remaining={remaining} />
-            </View>
-
-            <View style={styles.audio_container}>
-                <AudioControl {...audio} />
-            </View>
-
-            <View style={styles.control_container}>
-                <Control audioPlaying={audio.playing}
-                        active={active}
-                        editMode={edit}
-                        onApply={() => onApplyEdit(minutes)}
-                        onStart={() => onStart(remaining, edit)}
-                        onCancel={onCancelEdit}
-                        onPause={onPause}
-                        onReset={onReset} />
-            </View>
           </View>
         )
     }
@@ -132,26 +79,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'white',
     },
-    timer_container: {
-        flex: 6,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        width: '100%'
-    },
-    audio_container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        width: '100%'
-    },
-    control_container: {
-        flex: 3,
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%'
-    }
 })
 
 export default connect(
@@ -161,10 +88,6 @@ export default connect(
             session,
             timer
         } = actions
-
-        const {
-            navigation: { navigate }
-        } = props
 
         const viewActions = ({
             onUpdateEdit: (duration) => {
@@ -196,12 +119,7 @@ export default connect(
                 KeepAwake.deactivate()
             }
         })
-
-        const nav = {
-            settings: (params) => navigate('Settings', params)
-        }
-
-        return { actions: viewActions, navigation: nav }
+        return { actions: viewActions }
     },
     store
-)(TimerContainerComponent)
+)(SettingsContainerComponent)

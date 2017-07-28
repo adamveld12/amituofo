@@ -1,74 +1,69 @@
-import React from 'react'
-import weedux, { middleware } from 'weedux'
-import { AsyncStorage } from 'react-native'
-import reducers from './reducers'
 import createSagaMiddleware from 'redux-saga'
-import { v4 } from 'uuid'
-
-const { thunk, logger } = middleware
+import Weedux from 'weedux'
+import reducers from './reducers'
+import sagas from './sagas'
+import a from './actions/index'
 
 export const initialState = {
-  user: {},
-  timer: {
-      // if timer is in edit mode
-    edit: false,
-    minutes: 0,
-  },
-  session: {
-    // if a countdown was started
-    started: false,
-    // if the countdown is active
-    active: false,
-    // if the session is finished
-    completed: false,
-    // how long the session will last in seconds
-    duration: 1, //5 * 60,
-    // how many seconds are left in the session
-    remaining: 1, //5 * 60,
-    // the # of interruptions (pauses) during the session
-    interruptions: 0,
-  },
-  audio: {
-    audioURI: 'singing_gong.mp3',
-    playing: false,
-    finalVolume: 1,
-    rampTime: 12
-  },
-  stats: {
+    user: {},
+    timer: {
+        // if timer is in edit mode
+        edit: false,
+        minutes: 0,
+    },
+    session: {
+        // if a countdown was started
+        started: false,
+        // if the countdown is active
+        active: false,
+        // if the session is finished
+        completed: false,
+        // how long the session will last in seconds
+        duration: 1, // 5 * 60,
+        // how many seconds are left in the session
+        remaining: 1, // 5 * 60,
+        // the # of interruptions (pauses) during the session
+        interruptions: 0,
+    },
+    audio: {
+        audioURI: 'singing_gong.mp3',
+        playing: false,
+        finalVolume: 1,
+        rampTime: 12,
+    },
+    stats: {
     // sessions that were quit before finishing
-    quits: [],
-    // sessions that were successfully completed
-    completed: [],
-  }
+        quits: [],
+        // sessions that were successfully completed
+        completed: [],
+    },
 }
 
 const sagaMiddleware = createSagaMiddleware()
 
-const persist = s => n => a => {
-    n(a)
-    n({ type: "SAVE_STATE" })
-}
-
-const actionLog = s => n => a => {
+const actionLog = ({ getState }) => next => (action) => {
+    // eslint-disable-next-line no-undef 
     if (__DEV__) {
-        const oldState = s.getState()
-        n(a)
-        const newState = s.getState()
-        console.info("ACTION - ", a, " STATE - BEFORE:", oldState, " AFTER:", newState)
+        try {
+            console.groupCollapsed('STATE', action)
+            const oldState = getState()
+            console.info('OLD', oldState)
+            next(a)
+            const newState = getState()
+            console.info('NEW', newState)
+        } finally {
+            console.groupEnd()
+        }
     } else {
-        n(a)
+        next(a)
     }
 }
 
-export const store = new weedux(initialState, reducers, [actionLog, persist, sagaMiddleware])
+export const store = new Weedux(initialState, reducers, [actionLog, sagaMiddleware])
 
-import sagas from './sagas'
 sagaMiddleware.run(sagas)
 
 export const subscribe = store.subscribe
 export const dispatch = store.dispatch
 export const getState = store.getState
-
-import a from './actions/index.js'
-
 export const actions = a
