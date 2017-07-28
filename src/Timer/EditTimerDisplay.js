@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import { sprintf } from 'sprintf'
 
 export default class EditTimerDisplay extends Component {
+  // es-lint-disable-next-line
   static propTypes = {
       minutes: PropTypes.number.isRequired,
       onCancelEdit: PropTypes.func.isRequired,

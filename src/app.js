@@ -8,11 +8,12 @@ import { connect } from 'weedux'
 
 import Timer from './Timer'
 import Settings from './Settings'
+import Stats from './Stats'
 
 const Screens = StackNavigator({
     Timer: { screen: Timer, title: 'Timer' },
     Settings: { screen: Settings, title: 'Settings' },
-    // Stats: { screen: Stats, title: "Statistics" },
+    Stats: { screen: Stats, title: "Stats" },
 },
 {
     initialRouteName: 'Timer',

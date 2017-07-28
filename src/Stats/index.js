@@ -12,42 +12,31 @@ import { connect } from 'weedux'
 
 import { NavigationControl } from '../components'
 
-class SettingsContainer extends Component {
+class StatsContainer extends Component {
     static navigationOptions = {
-        title: "Settings"
+        title: "Stats"
     }
 
     static propTypes = {
-        actions: PropTypes.shape({
-            onApplySetting: PropTypes.func.isRequired,
-            onClearStats: PropTypes.func.isRequired,
-            onSendUsage: PropTypes.func.isRequired
-        }).isRequired,
-        finalVolume: PropTypes.number.isRequired,
-        rampTime: PropTypes.number.isRequired,
+        completed: PropTypes.array.isRequired,
+        quits: PropTypes.array.isRequired,
         navigation: PropTypes.shape({
+            settings: PropTypes.func.isRequired,
             timer: PropTypes.func.isRequired,
-            //stats: PropTypes.func.isRequired,
         })
     }
 
     render(){
         const {
-            actions: {
-                onApplySetting,
-                onClearStats,
-                onSendUsage,
-            },
-            finalVolume,
-            rampTime,
+            completed,
+            quits,
             navigation
         } = this.props
 
 
         return (
           <View style={styles.container}>
-            <NavigationControl currentScreen={SettingsContainer.navigationOptions.title} 
-                               navigation={navigation} />
+            <NavigationControl currentScreen={StatsContainer.navigationOptions.title} navigation={navigation} />
             <Text>Coming Soon.</Text>
           </View>
         )
@@ -68,25 +57,18 @@ function buildNavigator(screen, navigate, params){
 }
 
 export default connect(
-    (state, props) => ({ ...props, ...state.audio }),
+    (state, props) => ({ ...props, ...state.stats }),
     (dispatch, props, state) => {
-        const {
-            session,
-            timer
-        } = actions
-
         const {
             navigation: { navigate }
         } = props
 
-        const viewActions = ({})
-
         const nav = {
-            timer: buildNavigator('Timer', navigate, {}),
-            stats: buildNavigator('Stats', navigate, {})
+            settings: buildNavigator('Settings', navigate, {}),
+            timer: buildNavigator('Timer', navigate, {})
         }
 
-        return { actions: viewActions , navigation: nav}
+        return { navigation: nav }
     },
     store
-)(SettingsContainer)
+)(StatsContainer)

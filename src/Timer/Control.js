@@ -32,7 +32,6 @@ export default class Control extends PureComponent {
 
         if (audioPlaying) {
             return (<CompletedTimerControl {...styles} onReset={onReset} />)
-
         } else if (editMode) {
             return (<EditTimerControl {...styles} onApply={onApply} onCancel={onCancel} />)
         } else {

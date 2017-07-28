@@ -12,9 +12,9 @@ export const initialState = {
         minutes: 0,
     },
     session: {
-        // if a countdown was started
+        // if a meditation session was started
         started: false,
-        // if the countdown is active
+        // if the countdown timer is active
         active: false,
         // if the session is finished
         completed: false,
@@ -45,17 +45,18 @@ const actionLog = ({ getState }) => next => (action) => {
     // eslint-disable-next-line no-undef 
     if (__DEV__) {
         try {
-            console.groupCollapsed('STATE', action)
-            const oldState = getState()
-            console.info('OLD', oldState)
-            next(a)
-            const newState = getState()
-            console.info('NEW', newState)
+            console.groupCollapsed(`ACTION ${action.type}`, action)
+
+            console.info('OLD', getState())
+
+            next(action)
+
+            console.info('NEW', getState())
         } finally {
             console.groupEnd()
         }
     } else {
-        next(a)
+        next(action)
     }
 }
 
