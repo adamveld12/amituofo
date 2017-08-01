@@ -4,6 +4,8 @@ import reducers from './reducers'
 import sagas from './sagas'
 import a from './actions/index'
 
+const STARTING_TIME = (__DEV__) ? 1 : 5 * 60
+
 export const initialState = {
     user: {},
     timer: {
@@ -19,9 +21,9 @@ export const initialState = {
         // if the session is finished
         completed: false,
         // how long the session will last in seconds
-        duration: 1, // 5 * 60,
+        duration: STARTING_TIME,
         // how many seconds are left in the session
-        remaining: 1, // 5 * 60,
+        remaining: STARTING_TIME,
         // the # of interruptions (pauses) during the session
         interruptions: 0,
     },

@@ -11,7 +11,8 @@ import {
     SAVE_STATE,
     LOAD_STATE,
     REPLACE_STATE,
-} from './types.js'
+    AUDIO_VOLUME_EDIT,
+} from './types'
 
 
 const session = {
@@ -38,9 +39,14 @@ const stats = {
     quit: () => ({ type: SESSION_QUIT }),
 }
 
+const audio = {
+    volume: level => ({ type: AUDIO_VOLUME_EDIT, volume: level }),
+}
+
 export default {
     session,
     timer,
     storage,
     stats,
+    audio,
 }

@@ -27,6 +27,7 @@ class TimerContainer extends Component {
             onCancelEdit: PropTypes.func.isRequired,
             onApplyEdit: PropTypes.func.isRequired,
             onUpdateEdit: PropTypes.func.isRequired,
+            increaseVolume: PropTypes.func.isRequired,
         }).isRequired,
         timer: PropTypes.shape({
             edit: PropTypes.bool.isRequired
@@ -74,6 +75,7 @@ class TimerContainer extends Component {
                 onCancelEdit,
                 onApplyEdit,
                 onUpdateEdit,
+                increaseVolume,
             },
             timer: {
                 edit,
@@ -92,8 +94,12 @@ class TimerContainer extends Component {
         return (
           <View style={styles.container}>
             <View style={styles.timer_container}>
+            {
+                /*
                 <NavigationControl currentScreen={TimerContainer.navigationOptions.title} 
                                    navigation={navigation} />
+                */
+            }
 
                 <TimerDisplay active={active}
                               audioPlaying={audio.playing}
@@ -108,7 +114,7 @@ class TimerContainer extends Component {
             </View>
 
             <View style={styles.audio_container}>
-                <AudioControl {...audio} />
+                <AudioControl increaseVolume={increaseVolume} {...audio} />
             </View>
 
             <View style={styles.control_container}>
@@ -165,7 +171,8 @@ export default connect(
         const {
             session,
             timer,
-            stats
+            stats,
+            audio,
         } = actions
 
         const {
@@ -205,6 +212,10 @@ export default connect(
                 dispatch(stats.quit())
                 dispatch(timer.apply(duration))
                 KeepAwake.deactivate()
+            },
+            increaseVolume: (volume) => {
+                dispatch(audio.volume(volume))
+                dispatch(stats.interrupt())
             }
         })
 

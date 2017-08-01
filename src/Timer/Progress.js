@@ -19,13 +19,18 @@ export default class Progress extends PureComponent {
         } = this.props
 
         const fill = editMode ? 100 : remaining/duration * 100
+        const fillColor = "black"//"#8ddba6"
+        const backgroundColor = "white" //"#3d5875"
 
         return (
             <AnimatedCircularProgress size={300}
                                     width={15}
                                     fill={fill}
-                                    tintColor="#8ddba6"
-                                    backgroundColor={ fill >= 100 ? "#8ddba6" : "#3d5875"}>
+                                    prefill={100}
+                                    rotation={180}
+                                    linecap="round"
+                                    tintColor={fillColor}
+                                    backgroundColor={ fill >= 100 ? fillColor : backgroundColor}>
             {
               () => children
             }

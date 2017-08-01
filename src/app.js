@@ -39,13 +39,14 @@ class App extends Component {
     }
 
     render() {
+        const { 
+            reset
+        } = this.props;
+
         return (
             <View style={styles.container}>
-                <Screens style={{
-                    flex: 1,
-                    width: '100%',
-                    height: '100%',
-                }} />
+                <Screens style={{ flex: 1, width: '100%', height: '100%', }} 
+                         onNavigationStateChange={() => reset()}/>
             </View>
         )
     }
@@ -73,6 +74,7 @@ export default connect(
     state => state,
     dispatch => ({
         load: () => dispatch(actions.storage.load()),
+        reset: () => dispatch(actions.session.reset())
     }),
     store,
 )(App)

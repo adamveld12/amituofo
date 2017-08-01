@@ -38,6 +38,7 @@ export default class CountdownTimerControl extends PureComponent {
                        backgroundColor="transparent"
                        iconStyle={icon}
                        color={color} />
+
       </View>
     )
   }

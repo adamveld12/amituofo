@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 
 import { sprintf } from 'sprintf'
 
+import FAIcon from 'react-native-vector-icons/FontAwesome'
+
 export default class CountdownTimerDisplay extends PureComponent {
     static propTypes = {
         remaining: PropTypes.number.isRequired,
@@ -26,12 +28,11 @@ export default class CountdownTimerDisplay extends PureComponent {
         const seconds = remaining - (minutes * 60)
 
         return (
-          <View style={styles.progress}>
-              <Text style={styles.timerDisplay}
-                    onLongPress={() => onStartEditMode()} >
+            <View style={styles.progress}>
+                <Text style={styles.timerDisplay} onLongPress={() => onStartEditMode()} >
                 { sprintf("%01d:%02d", minutes, seconds) }
-              </Text>
-          </View>
+                </Text>
+            </View>
         )
     }
 }
@@ -41,6 +42,7 @@ export default class CountdownTimerDisplay extends PureComponent {
 export const styles = StyleSheet.create({
     progress: {
         flex: 1,
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
@@ -51,9 +53,13 @@ export const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         textAlign: 'center',
         color: 'white',
-        fontSize: 40,
+        fontSize: 45,
         fontWeight: "100",
         color: 'black',
         width: '100%',
     },
+    icon: {
+        fontSize: 20,
+        textAlign: 'center'
+    }
 })
